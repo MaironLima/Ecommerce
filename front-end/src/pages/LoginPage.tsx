@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardAction } from "../components/ui/corrections";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
 import { useMutation } from "@tanstack/react-query";
@@ -28,7 +28,8 @@ export function LoginPage() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from ?? "/";
+  const [searchParams] = useSearchParams();
+  const from = (location.state as { from?: string } | null)?.from ?? searchParams.get("from") ?? "/";
 
   function popUp(): void {
     setMes(true);

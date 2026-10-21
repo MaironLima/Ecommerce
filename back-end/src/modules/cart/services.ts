@@ -1,4 +1,5 @@
 import { prisma } from "../../libs/prisma.js";
+import { reserveStock } from "../stock/services.js";
 
 const RESERVATION_TTL_MS = 15 * 60 * 1000;
 
@@ -19,8 +20,6 @@ export async function cartAddService(userId: string, variantId: string, quantity
       include: { product_sync: { select: { base_price: true } } },
     });
 
-    if (variant.stock < quantity) throw new Error("Insufficient stock");
-
     const unitPrice = variant.price_override
       ? Number(variant.price_override)
       : Number(variant.product_sync.base_price);
@@ -31,10 +30,7 @@ export async function cartAddService(userId: string, variantId: string, quantity
     });
 
     if (existing) {
-      await tx.productVariant.update({
-        where: { id: variantId },
-        data: { stock: { decrement: quantity } },
-      });
+      await reserveStock(tx, variantId, quantity);
 
       const updated = await tx.cartItem.update({
         where: { id: existing.id },
@@ -72,10 +68,7 @@ export async function cartAddService(userId: string, variantId: string, quantity
       },
     });
 
-    await tx.productVariant.update({
-      where: { id: variantId },
-      data: { stock: { decrement: quantity } },
-    });
+    await reserveStock(tx, variantId, quantity);
 
     await tx.inventoryReservation.create({
       data: {
@@ -118,14 +111,7 @@ export async function cartPutService(userId: string, itemId: string, quantity: n
     const delta = quantity - currentlyHeld;
 
     if (delta > 0) {
-      if (item.variant_sync.stock < delta) {
-        throw new Error("Insufficient stock");
-      }
-
-      await tx.productVariant.update({
-        where: { id: item.variant_id },
-        data: { stock: { decrement: delta } },
-      });
+      await reserveStock(tx, item.variant_id, delta);
     } else if (delta < 0) {
       await tx.productVariant.update({
         where: { id: item.variant_id },

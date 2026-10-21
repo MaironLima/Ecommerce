@@ -1,9 +1,10 @@
 import { prisma } from '../../libs/prisma.js';
 import { stripe } from '../../libs/stripe.js';
 import { HttpError } from '../../common/utils/errors.js';
+import { reserveStock } from '../stock/services.js';
 import type Stripe from 'stripe';
-import nodemailer from 'nodemailer';
-import { MAIL_PASSWORD, MAIL_USER } from '../../config/env.js';
+import { notify } from '../notifications/services.js';
+import logger from '../../common/utils/logger.js';
 
 const RESERVATION_TTL_MS = 15 * 60 * 1000;
 
@@ -11,13 +12,14 @@ function reservationExpiry(from: Date = new Date()): Date {
   return new Date(from.getTime() + RESERVATION_TTL_MS);
 }
 
-async function finalizeOrderAsPaid(orderId: string) {
-  await prisma.$transaction(async tx => {
+// Single place where an order becomes PAID (webhook, confirm and status poll all land here).
+export async function finalizeOrderAsPaid(orderId: string) {
+  const paid = await prisma.$transaction(async tx => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: { order_item: { select: { id: true, cart_item_id: true } } },
     });
-    if (!order || order.status === 'PAID') return;
+    if (!order || order.status === 'PAID') return null;
 
     const cartItemIds = order.order_item
       .map(item => item.cart_item_id)
@@ -34,7 +36,17 @@ async function finalizeOrderAsPaid(orderId: string) {
     }
 
     await tx.order.update({ where: { id: order.id }, data: { status: 'PAID' } });
+    return order;
   });
+
+  if (paid) {
+    logger.info('order.paid', { event: 'order.paid', orderId: paid.id, total: Number(paid.total) });
+    await notify(paid.user_id, 'ORDER_PAID', `Payment confirmed for order #${paid.id.slice(0, 8)} ($ ${Number(paid.total).toFixed(2)}).`, {
+      subject: 'Order Purchase Confirmed',
+      link: '/profile',
+      linkLabel: 'View your order and rate your purchase',
+    });
+  }
 }
 
 export async function createCheckoutSessionService(
@@ -115,6 +127,12 @@ export async function createCheckoutSessionService(
 
         // Pristine / declined-then-reset: safe to reuse the same intent.
         if (existing && existing.status === 'requires_payment_method') {
+          if (shippingAddress) {
+            await prisma.order.update({
+              where: { id: pendingOrder.id },
+              data: { shipping_address: shippingAddress as object },
+            });
+          }
           return {
             order_id: pendingOrder.id,
             client_secret: existing.client_secret,
@@ -161,23 +179,7 @@ export async function createCheckoutSessionService(
         continue;
       }
 
-      const variant = await tx.productVariant.findUniqueOrThrow({
-        where: { id: item.variant_id },
-        select: { stock: true },
-      });
-
-      if (variant.stock < item.quantity) {
-        throw new HttpError(
-          409,
-          `Insufficient stock for one or more cart items. Please refresh your cart and try again.`,
-          'OUT_OF_STOCK',
-        );
-      }
-
-      await tx.productVariant.update({
-        where: { id: item.variant_id },
-        data: { stock: { decrement: item.quantity } },
-      });
+      await reserveStock(tx, item.variant_id, item.quantity, 'Insufficient stock for one or more cart items. Please refresh your cart and try again.');
 
       await tx.inventoryReservation.create({
         data: {
@@ -206,7 +208,12 @@ export async function createCheckoutSessionService(
     orderId = reuseOrderId;
     await prisma.order.update({
       where: { id: orderId },
-      data: { total, currency, status: 'PENDING' },
+      data: {
+        total,
+        currency,
+        status: 'PENDING',
+        ...(shippingAddress ? { shipping_address: shippingAddress as object } : {}),
+      },
     });
   } else {
     const order = await prisma.order.create({
@@ -245,8 +252,11 @@ export async function createCheckoutSessionService(
       where: { id: orderId },
       data: { status: 'FAILED' },
     });
+    logger.error('checkout.stripe_error', { event: 'checkout.stripe_error', orderId, reason: (err as Error).message });
     throw new HttpError(502, `Stripe error: ${(err as Error).message}`, 'STRIPE_ERROR');
   }
+
+  logger.info('checkout.session.created', { event: 'checkout.session.created', orderId, total, currency, items: selectedItems.length, reused: Boolean(reuseOrderId) });
 
   await prisma.order.update({
     where: { id: orderId },
@@ -256,56 +266,11 @@ export async function createCheckoutSessionService(
     },
   });
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (user?.email && orderCopy?.status === 'PENDING') {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: MAIL_USER,
-        pass: MAIL_PASSWORD,
-      },
-    });
-
-    await transporter.sendMail({
-      from: 'E-commerce <no-reply@yourapp.com>',
-      to: user?.email,
+  if (orderCopy) {
+    await notify(userId, 'ORDER_CREATED', `Order #${orderCopy.id.slice(0, 8)} registered ($ ${Number(orderCopy.total).toFixed(2)}). Awaiting payment.`, {
       subject: 'Checkout Order Registered Successfully',
-      html: `
-    <p>Hello ${user?.name},</p>
-
-    <p>Your checkout order has been successfully registered.</p>
-
-    <p>
-      <strong>Order ID:</strong> ${orderCopy?.id}<br>
-      <strong>Order Date:</strong> ${orderCopy?.created_at}<br>
-      <strong>Total Amount:</strong> $ ${orderCopy?.total}
-    </p>
-
-    <p>
-      We have received your order and it is now being processed.
-    </p>
-
-    <p>
-      <a href="http://localhost:3000/orders">
-        View your order
-      </a>
-    </p>
-
-    <p>
-      If you did not place this order, please contact our support team immediately.
-    </p>
-
-    <p>
-      Thank you for choosing Super E-commerce.<br>
-      Best regards,<br>
-      Super E-commerce Team
-    </p>
-  `,
+      link: '/profile',
+      linkLabel: 'View your order',
     });
   }
 
@@ -373,8 +338,6 @@ export async function confirmCheckoutService(userId: string, orderId: string) {
     },
   });
 
-  console.log(order);
-
   if (!order) throw new HttpError(404, 'Order not found', 'ORDER_NOT_FOUND');
   if (order.status === 'PAID') return { ...order, status: 'PAID' as const };
   if (order.status !== 'PENDING') {
@@ -387,58 +350,6 @@ export async function confirmCheckoutService(userId: string, orderId: string) {
   const intent = await stripe.paymentIntents.retrieve(order.stripe_payment_intent_id);
 
   if (intent.status === 'succeeded') {
-    const timeNow = new Date();
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: MAIL_USER,
-        pass: MAIL_PASSWORD,
-      },
-    });
-
-    await transporter.sendMail({
-      from: 'E-commerce <no-reply@yourapp.com>',
-      to: user?.email,
-      subject: 'Order Purchase Confirmed',
-      html: `
-    <p>Hello ${user?.name},</p>
-
-    <p>
-      Your order has been successfully purchased and your payment has been confirmed.
-    </p>
-
-    <p>
-      <strong>Order ID:</strong> ${order?.id}<br>
-      <strong>Purchase Date:</strong> ${timeNow}<br>
-      <strong>Total Amount:</strong> $ ${order?.total}<br>
-      <strong>Payment Method:</strong> Credit card
-    </p>
-
-    <p>
-      Your order is now being prepared for shipment.
-    </p>
-
-    <p>
-      <a href="http://localhost:3000/orders">
-        View your order and rate your purchase
-      </a>
-    </p>
-
-    <p>
-      Thank you for your purchase from Super E-commerce!
-    </p>
-
-    <p>
-      Best regards,<br>
-      Super E-commerce Team
-    </p>`,
-    });
-
     await finalizeOrderAsPaid(order.id);
     return { ...order, status: 'PAID' as const };
   }

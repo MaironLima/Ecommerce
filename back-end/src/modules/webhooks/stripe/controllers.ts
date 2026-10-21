@@ -4,6 +4,7 @@ import { stripe } from '../../../libs/stripe.js';
 import { STRIPE_WEBHOOK_SECRET } from '../../../config/env.js';
 import { prisma } from '../../../libs/prisma.js';
 import logger from '../../../common/utils/logger.js';
+import { finalizeOrderAsPaid } from '../../checkout/services.js';
 
 const processedEvents = new Set<string>();
 
@@ -87,40 +88,7 @@ async function handlePaymentIntentSucceeded(intent: Stripe.PaymentIntent) {
     return;
   }
 
-  await prisma.$transaction(async (tx) => {
-    const order = await tx.order.findUnique({
-      where: { id: orderId },
-      include: { order_item: { select: { id: true, cart_item_id: true } } },
-    });
-
-    if (!order) {
-      logger.warn(`[stripe-webhook] order ${orderId} not found`);
-      return;
-    }
-    if (order.status === 'PAID') return;
-
-    const cartItemIds = order.order_item
-      .map((item) => item.cart_item_id)
-      .filter((id): id is string => Boolean(id));
-
-    if (cartItemIds.length > 0) {
-      const reservations = await tx.inventoryReservation.findMany({
-        where: { cart_item_id: { in: cartItemIds } },
-      });
-
-      for (const reservation of reservations) {
-        await tx.inventoryReservation.delete({ where: { id: reservation.id } });
-      }
-
-      await tx.cartItem.deleteMany({ where: { id: { in: cartItemIds } } });
-    }
-
-    await tx.order.update({
-      where: { id: order.id },
-      data: { status: 'PAID' },
-    });
-  });
-
+  await finalizeOrderAsPaid(orderId);
   logger.info(`[stripe-webhook] order ${orderId} marked PAID`);
 }
 

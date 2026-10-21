@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { variantAddSchema, variantAttSchema } from './dto';
 import { variantAddService, variantAttService, variantGetService } from './services';
+import { audit } from '../../../common/utils/audit.js';
 
 export async function variantGetController(req: Request, res: Response) {
   try {
@@ -38,6 +39,7 @@ export async function variantAddController(req: Request, res: Response) {
     }
 
     await variantAddService(id, attributes, stock, priceOverride);
+    await audit((req as any).user?.userId, 'VARIANT_CREATE', 'Product', id, { attributes, stock, priceOverride });
 
     res.status(201).json({ message: 'The variation has been created' });
   } catch (e: any) {
@@ -62,6 +64,7 @@ export async function variantAttController(req: Request, res: Response) {
       attributes = typeof body.attributes === 'string' ? JSON.parse(body.attributes) : body.attributes;
     }
     await variantAttService(variantId, attributes, stock, priceOverride);
+    await audit((req as any).user?.userId, 'VARIANT_UPDATE', 'ProductVariant', variantId, { attributes, stock, priceOverride });
 
     res.status(200).json({ message: 'The variation has been updated' });
   } catch (e: any) {

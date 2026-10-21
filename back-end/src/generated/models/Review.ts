@@ -259,6 +259,7 @@ export type ReviewOrderByWithRelationInput = {
 
 export type ReviewWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  product_id_user_id?: Prisma.ReviewProduct_idUser_idCompoundUniqueInput
   AND?: Prisma.ReviewWhereInput | Prisma.ReviewWhereInput[]
   OR?: Prisma.ReviewWhereInput[]
   NOT?: Prisma.ReviewWhereInput | Prisma.ReviewWhereInput[]
@@ -271,7 +272,7 @@ export type ReviewWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"Review"> | Date | string
   product_sync?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
   id_sync?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "product_id_user_id">
 
 export type ReviewOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -386,6 +387,11 @@ export type ReviewListRelationFilter = {
 
 export type ReviewOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type ReviewProduct_idUser_idCompoundUniqueInput = {
+  product_id: string
+  user_id: string
 }
 
 export type ReviewCountOrderByAggregateInput = {
@@ -511,10 +517,6 @@ export type ReviewUncheckedUpdateManyWithoutProduct_syncNestedInput = {
   update?: Prisma.ReviewUpdateWithWhereUniqueWithoutProduct_syncInput | Prisma.ReviewUpdateWithWhereUniqueWithoutProduct_syncInput[]
   updateMany?: Prisma.ReviewUpdateManyWithWhereWithoutProduct_syncInput | Prisma.ReviewUpdateManyWithWhereWithoutProduct_syncInput[]
   deleteMany?: Prisma.ReviewScalarWhereInput | Prisma.ReviewScalarWhereInput[]
-}
-
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
 }
 
 export type ReviewCreateWithoutId_syncInput = {

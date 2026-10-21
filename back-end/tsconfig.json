@@ -2,7 +2,6 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
     "outDir": "./dist",
 
     // Environment Settings
@@ -39,11 +38,6 @@
     "types": ["node"],
     "noEmit": true
   },
-  "ts-node": {
-    "transpileOnly": true,
-    "esm": true,
-    "experimentalEsm": true
-  },
-  "include": ["src", "global"],
+  "include": ["src", "global", "tests", "prisma/seed.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,7 @@
 import { prisma } from '../../libs/prisma.js';
 import { stripe } from '../../libs/stripe.js';
 import { HttpError } from '../../common/utils/errors.js';
+import { reserveStock } from '../stock/services.js';
 
 export async function listOrdersService(userId: string) {
   const orders = await prisma.order.findMany({
@@ -171,18 +172,7 @@ export async function resumeOrderService(userId: string, orderId: string) {
         }
       }
 
-      const variant = await tx.productVariant.findUniqueOrThrow({
-        where: { id: item.variant_id },
-        select: { stock: true },
-      });
-
-      if (variant.stock < item.quantity) {
-        throw new HttpError(
-          409,
-          `Insufficient stock to resume one or more items. Please refresh your cart.`,
-          'OUT_OF_STOCK',
-        );
-      }
+      await reserveStock(tx, item.variant_id, item.quantity, 'Insufficient stock to resume one or more items. Please refresh your cart.');
 
       const created = await tx.cartItem.create({
         data: {
@@ -191,11 +181,6 @@ export async function resumeOrderService(userId: string, orderId: string) {
           quantity: item.quantity,
           unit_price_snapshot: item.unit_price_snapshot,
         },
-      });
-
-      await tx.productVariant.update({
-        where: { id: item.variant_id },
-        data: { stock: { decrement: item.quantity } },
       });
 
       await tx.inventoryReservation.create({

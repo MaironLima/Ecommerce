@@ -1,17 +1,66 @@
-import { Search, CircleUser, ShoppingCart } from "lucide-react";
+import { Search, CircleUser, ShoppingCart, Bell, LayoutDashboard, Package, User, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { ModeToggle } from "./ModeToggle";
-import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Badge } from "./ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { useCartStore } from "@/stores/cartStore";
 import { useStore } from "@/stores/store";
+import { isAdminRole, roleOf } from "@/lib/auth";
+import { useLogout } from "@/hooks/use-logout";
+import privateAPI from "@/services/api/privateApi";
+
+interface NotificationItem {
+  id: string;
+  read: boolean;
+}
+
+// Icon buttons sit on the primary bar, so they use a translucent white hover instead of the accent color.
+const barButton = "relative text-primary-foreground hover:bg-white/15 hover:text-primary-foreground";
+
+function CountBadge({ count, label }: { count: number; label: string }) {
+  if (count <= 0) return null;
+  return (
+    <Badge
+      variant="destructive"
+      aria-label={`${count} ${label}`}
+      className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1 text-[10px] shadow-none"
+    >
+      {count > 99 ? "99+" : count}
+    </Badge>
+  );
+}
 
 function Header() {
-  const [valor, setValor] = useState("");
+  const [searchParams] = useSearchParams();
+  const [valor, setValor] = useState(searchParams.get("q") ?? "");
   const navigate = useNavigate();
-  const cartItems = useCartStore((s) => s.items);
+  const logout = useLogout();
+  const cartCount = useCartStore((s) => s.items.length);
   const fetchCart = useCartStore((s) => s.fetchCart);
-  const cartCount = cartItems.length;
-  const accessToken = useStore((s) => s.accessToken);
+  const { accessToken, appName, name } = useStore();
+  const isAdmin = isAdminRole(roleOf(accessToken));
+
+  const { data: unread = 0 } = useQuery({
+    queryKey: ["notifications"],
+    enabled: !!accessToken,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data } = await privateAPI.get<{ notifications: NotificationItem[] }>("/notifications");
+      return data.notifications;
+    },
+    select: (list) => list.filter((n) => !n.read).length,
+  });
 
   useEffect(() => {
     if (accessToken) void fetchCart();
@@ -19,64 +68,85 @@ function Header() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  };
-
-  const onClickIcon = () => {
-    navigate("/");
+    const q = valor.trim();
+    navigate(q ? `/?q=${encodeURIComponent(q)}` : "/");
   };
 
   return (
-    <header className="bg-primary h-16 w-full flex items-center justify-between text-white text-xl px-4">
-      <div>
-        <button onClick={onClickIcon} type="button">
-          <img src="/vite.svg" alt="Logo" className="h-10" />
-        </button>
-      </div>
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          className="global-input"
-          type="text"
-          placeholder="Search here"
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-        />
-        <button type="submit" className="global-btn" title="Search">
-          <Search />
-        </button>
-      </form>
+    <header className="sticky top-0 z-40 w-full bg-primary text-primary-foreground shadow-md">
+      <div className="flex h-16 items-center gap-3 px-4">
+        <Link to="/" onClick={() => setValor("")} className="flex shrink-0 items-center gap-2" aria-label="Home">
+          <img src="/vite.svg" alt="Logo" className="h-9" />
+          <span className="hidden text-lg font-bold tracking-tight lg:inline">{appName}</span>
+        </Link>
 
-      <div className="flex items-center gap-2">
-        <ModeToggle />
+        <form onSubmit={handleSubmit} role="search" className="relative mx-auto min-w-0 flex-1 max-w-xl">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 opacity-70" />
+          <Input
+            type="search"
+            placeholder="Search products..."
+            aria-label="Search products"
+            value={valor}
+            onChange={(e) => setValor(e.target.value)}
+            className="h-10 rounded-full border-white/20 bg-white/15 pl-9 text-primary-foreground placeholder:text-primary-foreground/70 focus-visible:bg-white/20 focus-visible:ring-white/60"
+          />
+        </form>
 
-        <div className="flex items-center overflow-hidden rounded">
-          {/* <span className="global-btn font-bold flex items-center rounded-none rounded-l">
-          </span> */}
-          <button
-            type="button"
-            title="Cart"
-            className="global-btn flex items-center rounded-none rounded-r gap-2"
-            onClick={() => navigate("/cart")}
-            >
-            {cartCount}
+        <nav className="flex shrink-0 items-center gap-1" aria-label="Account">
+          <ModeToggle variant="ghost" className={barButton} />
+
+          {accessToken && (
+            <Button variant="ghost" size="icon" className={barButton} title="Notifications" aria-label="Notifications" onClick={() => navigate("/profile?tab=notifications")}>
+              <Bell />
+              <CountBadge count={unread} label="unread notifications" />
+            </Button>
+          )}
+
+          <Button variant="ghost" size="icon" className={barButton} title="Cart" aria-label="Cart" onClick={() => navigate("/cart")}>
             <ShoppingCart />
-          </button>
-        </div>
-        <button
-          title="My orders"
-          type="button"
-          className="global-btn"
-          onClick={() => navigate("/orders")}
-        >
-          Orders
-        </button>
-        <button
-          title="Profile"
-          type="button"
-          className="global-btn"
-          onClick={() => navigate("/auth/login")}
-        >
-          <CircleUser />
-        </button>
+            <CountBadge count={cartCount} label="items in cart" />
+          </Button>
+
+          {accessToken ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className={barButton} title="Account" aria-label="Account menu">
+                  <CircleUser />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel className="truncate">{name || "My account"}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile?tab=account")}>
+                  <User /> Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile?tab=orders")}>
+                  <Package /> My orders
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile?tab=notifications")}>
+                  <Bell /> Notifications
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <LayoutDashboard /> Admin dashboard
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => void logout()} className="text-destructive focus:text-destructive">
+                  <LogOut /> Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              size="sm"
+              className="ml-1 h-9 rounded-xl bg-primary-foreground px-4 font-semibold text-primary shadow-sm hover:bg-primary-foreground/90"
+              onClick={() => navigate("/auth/login")}
+            >
+              <CircleUser /> Sign in
+            </Button>
+          )}
+        </nav>
       </div>
     </header>
   );

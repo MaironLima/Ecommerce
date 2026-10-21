@@ -397,7 +397,8 @@ export const ModelName = {
   InventoryReservation: 'InventoryReservation',
   Notification: 'Notification',
   Order: 'Order',
-  OrderItem: 'OrderItem'
+  OrderItem: 'OrderItem',
+  AuditLog: 'AuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "address" | "product" | "productVariant" | "category" | "productCategory" | "extraImagens" | "cart" | "cartItem" | "review" | "inventoryReservation" | "notification" | "order" | "orderItem"
+    modelProps: "user" | "address" | "product" | "productVariant" | "category" | "productCategory" | "extraImagens" | "cart" | "cartItem" | "review" | "inventoryReservation" | "notification" | "order" | "orderItem" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1453,6 +1454,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AuditLog: {
+      payload: Prisma.$AuditLogPayload<ExtArgs>
+      fields: Prisma.AuditLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AuditLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AuditLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        findFirst: {
+          args: Prisma.AuditLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AuditLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        findMany: {
+          args: Prisma.AuditLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+        }
+        create: {
+          args: Prisma.AuditLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        createMany: {
+          args: Prisma.AuditLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AuditLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+        }
+        delete: {
+          args: Prisma.AuditLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        update: {
+          args: Prisma.AuditLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.AuditLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AuditLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AuditLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.AuditLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditLogPayload>
+        }
+        aggregate: {
+          args: Prisma.AuditLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuditLog>
+        }
+        groupBy: {
+          args: Prisma.AuditLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AuditLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1507,7 +1582,17 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const AddressScalarFieldEnum = {
   id: 'id',
-  user_id: 'user_id'
+  user_id: 'user_id',
+  label: 'label',
+  street: 'street',
+  number: 'number',
+  complement: 'complement',
+  district: 'district',
+  city: 'city',
+  state: 'state',
+  zip_code: 'zip_code',
+  country: 'country',
+  created_at: 'created_at'
 } as const
 
 export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
@@ -1619,7 +1704,8 @@ export const NotificationScalarFieldEnum = {
   user_id: 'user_id',
   type: 'type',
   message: 'message',
-  read: 'read'
+  read: 'read',
+  created_at: 'created_at'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -1655,6 +1741,19 @@ export const OrderItemScalarFieldEnum = {
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
 
 
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  actor_id: 'actor_id',
+  action: 'action',
+  entity_type: 'entity_type',
+  entity_id: 'entity_id',
+  metadata: 'metadata',
+  created_at: 'created_at'
+} as const
+
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1686,6 +1785,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -1693,14 +1800,6 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 
@@ -1936,6 +2035,7 @@ export type GlobalOmitConfig = {
   notification?: Prisma.NotificationOmit
   order?: Prisma.OrderOmit
   orderItem?: Prisma.OrderItemOmit
+  auditLog?: Prisma.AuditLogOmit
 }
 
 /* Types for Logging */

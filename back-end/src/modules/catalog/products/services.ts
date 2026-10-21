@@ -1,5 +1,6 @@
 import { pool } from '../../../config/db';
 import { prisma } from '../../../libs/prisma';
+import { HttpError } from '../../../common/utils/errors.js';
 
 export type SortOption = 'most recent' | 'ascending price' | 'descending price';
 
@@ -78,7 +79,8 @@ export async function productsSearchService(
   }
 
   const sql = `
-    SELECT 
+    SELECT
+      id,
       title,
       description,
       base_price,
@@ -206,6 +208,8 @@ export async function productsAddService(
         throw new Error('It was not possible to sync extra images to the product');
       }
     }
+
+    return product;
   });
 }
 
@@ -270,6 +274,12 @@ export async function productsDeleteService(id: string) {
     const variants = await tx.productVariant.findMany({ where: { product_id: id } });
     const variantIds = variants.map(v => v.id);
 
+    // Orders keep an FK to the variant (purchase history must survive), so sold products can't be hard-deleted.
+    const sold = await tx.orderItem.count({ where: { variant_id: { in: variantIds } } });
+    if (sold > 0) {
+      throw new HttpError(409, 'This product has orders and cannot be deleted. Set its stock to 0 instead.', 'PRODUCT_HAS_ORDERS');
+    }
+
     if (variantIds.length > 0) {
       await tx.cartItem.deleteMany({ where: { variant_id: { in: variantIds } } });
       await tx.inventoryReservation.deleteMany({ where: { variant_id: { in: variantIds } } });
@@ -288,10 +298,13 @@ export async function productsDeleteAllService() {
     const products = await prisma.product.findMany({ select: { id: true } });
 
     for (const product of products) {
-      await productsDeleteService(product.id);
+      try {
+        await productsDeleteService(product.id);
+      } catch (e) {
+        if ((e as HttpError).code !== 'PRODUCT_HAS_ORDERS') throw e; // keep sold products
+      }
     }
   } catch (error) {
-    console.error('Delete all products error:', error);
     throw error;
   }
 }

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Package, CreditCard, Loader2 } from "lucide-react";
+import { ArrowLeft, Package, CreditCard, Loader2, Star } from "lucide-react";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import { useStore } from "@/stores/store";
 import type { AxiosError } from "axios";
 import publicAPI from "@/services/api/publicApi";
 import privateAPI from "@/services/api/privateApi";
 
-type OrderStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
+import { ORDER_STATUS_STYLES, type OrderStatus } from "@/lib/shared";
 
 interface OrderItem {
   id: string;
@@ -30,15 +30,7 @@ interface Order {
   items: OrderItem[];
 }
 
-const ORDER_STATUS_STYLES: Record<OrderStatus, string> = {
-  PENDING: "bg-amber-500/15 text-amber-600 border-amber-500/30",
-  PAID: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
-  FAILED: "bg-red-500/15 text-red-600 border-red-500/30",
-  CANCELLED: "bg-gray-500/15 text-gray-600 border-gray-500/30",
-  REFUNDED: "bg-blue-500/15 text-blue-600 border-blue-500/30",
-};
-
-function OrdersPage() {
+function OrdersPage({ embedded = false }: { embedded?: boolean }) {
   const accessToken = useStore((s) => s.accessToken);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -53,7 +45,7 @@ function OrdersPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const { data } = await publicAPI.get<Order[]>("/orders");
+        const { data } = await privateAPI.get<Order[]>("/orders");
         if (cancelled) return;
         setOrders(Array.isArray(data) ? data : []);
         setLoading(false);
@@ -70,11 +62,13 @@ function OrdersPage() {
   }, [accessToken]);
 
   return (
-    <div className="min-h-svh flex flex-col bg-background">
-      <div className="w-full max-w-7xl mx-auto px-6 p-4">
-        <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Orders"]} />
-      </div>
-      <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-6 flex flex-col gap-4">
+    <div className={embedded ? "flex flex-col" : "min-h-svh flex flex-col bg-background"}>
+      {!embedded && (
+        <div className="w-full max-w-7xl mx-auto px-6 p-4">
+          <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Orders"]} />
+        </div>
+      )}
+      <div className={embedded ? "flex flex-col gap-4" : "flex-1 w-full max-w-7xl mx-auto px-6 pb-6 flex flex-col gap-4"}>
         {paidId && (
           <div className="global-card border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
             Payment received — order #{paidId.slice(0, 8)} is now PAID.
@@ -157,10 +151,20 @@ function OrdersPage() {
                               {attrsLabel}
                             </span>
                           )}
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-2">
                             <span className="text-muted-foreground">
                               quantity: {item.quantity}
                             </span>
+                            {order.status === "PAID" && item.product_id && (
+                              <button
+                                type="button"
+                                className="text-xs text-primary flex items-center gap-1 hover:underline"
+                                onClick={() => navigate(`/product/${item.product_id}`)}
+                                title="Review this product"
+                              >
+                                <Star size={12} /> Review
+                              </button>
+                            )}
                             <span className="text-muted-foreground">
                               $ {(item.unit_price_snapshot * item.quantity).toFixed(2)}
                             </span>
@@ -216,13 +220,15 @@ function OrdersPage() {
           </div>
         )}
 
-        <button
-          className="global-btn bg-secondary text-secondary-foreground flex items-center justify-center gap-2 w-fit"
-          onClick={() => (window.history.length > 1 ? history.back() : undefined)}
-          title="Back"
-        >
-          <ArrowLeft size={16} /> Back
-        </button>
+        {!embedded && (
+          <button
+            className="global-btn bg-secondary text-secondary-foreground flex items-center justify-center gap-2 w-fit"
+            onClick={() => (window.history.length > 1 ? history.back() : undefined)}
+            title="Back"
+          >
+            <ArrowLeft size={16} /> Back
+          </button>
+        )}
       </div>
     </div>
   );

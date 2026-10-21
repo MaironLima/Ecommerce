@@ -1,6 +1,6 @@
 import { Moon, Sun } from "lucide-react"
 
-import { Button } from "./ui/button"
+import { Button, type ButtonProps } from "./ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +9,16 @@ import {
 } from "./ui/dropdown-menu"
 import { useTheme } from "./ThemeProvider"
 
-export function ModeToggle() {
+export function ModeToggle({
+  className = "global-btn",
+  variant = "default",
+}: Pick<ButtonProps, "className" | "variant">) {
   const { setTheme } = useTheme()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="default" size="icon" className="global-btn">
+        <Button variant={variant} size="icon" className={className} title="Toggle theme">
           <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
           <span className="sr-only">Toggle theme</span>

@@ -4,6 +4,10 @@ export default {
     content: ["./src/**/*.{js,jsx,ts,tsx,html,css}"],
   theme: {
   	extend: {
+  		// The Inter font imported in global.css; without this Tailwind's font-sans falls back to the system font.
+  		fontFamily: {
+  			sans: ['"Inter Variable"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

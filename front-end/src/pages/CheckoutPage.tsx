@@ -8,12 +8,13 @@ import {
 } from "@stripe/react-stripe-js";
 import { useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, MapPin } from "lucide-react";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import privateAPI from "@/services/api/privateApi";
 import { getStripe } from "@/services/api/stripe";
 import { useCartStore } from "@/stores/cartStore";
 import { useStore } from "@/stores/store";
+import { formatAddress, type Address } from "@/lib/shared";
 
 interface CheckoutSessionResponse {
   order_id: string;
@@ -195,10 +196,18 @@ function CheckoutPage() {
   const clearLocal = useCartStore((s) => s.clearLocal);
 
   const cartItemIds = (location.state as { cartItemIds?: string[] } | null)?.cartItemIds;
+  const [addressId, setAddressId] = useState<string | null>(null);
+
+  const { data: addresses, isLoading: loadingAddresses } = useQuery<Address[]>({
+    queryKey: ["addresses"],
+    enabled: !!accessToken,
+    queryFn: async () => (await privateAPI.get("/users/me/addresses")).data.addresses,
+  });
+  const address = addresses?.find((a) => a.id === addressId) ?? addresses?.[0] ?? null;
 
   const { data: session, isLoading, error, refetch } = useQuery<CheckoutSessionResponse>({
-    queryKey: ["checkout-session", accessToken, cartItemIds],
-    enabled: !!accessToken,
+    queryKey: ["checkout-session", accessToken, cartItemIds, address?.id],
+    enabled: !!accessToken && !!address,
     queryFn: async () => {
       await fetchCart();
       const cartNow = useCartStore.getState().items;
@@ -216,7 +225,11 @@ function CheckoutPage() {
       }
       const { data } = await privateAPI.post<CheckoutSessionResponse>(
         "/checkout/session",
-        { currency: "usd", ...(validIds ? { cart_item_ids: validIds } : {}) },
+        {
+          currency: "usd",
+          ...(address ? { shipping_address: address } : {}),
+          ...(validIds ? { cart_item_ids: validIds } : {}),
+        },
       );
       return data;
     },
@@ -246,7 +259,26 @@ function CheckoutPage() {
       : axiosErr?.response?.data?.error ?? error?.message ??
         "Failed to start checkout. Please retry.";
 
-  if (isLoading) {
+  if (accessToken && !loadingAddresses && !address) {
+    return (
+      <div className="min-h-svh flex flex-col bg-background">
+        <div className="w-full max-w-7xl mx-auto px-6 pt-4">
+          <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Checkout"]} />
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
+          <div className="global-card flex flex-col items-center gap-3 text-center">
+            <MapPin size={32} className="text-muted-foreground" />
+            <p className="text-muted-foreground">Add a shipping address before paying.</p>
+            <button className="global-btn" onClick={() => navigate("/profile?tab=addresses")}>
+              Add address
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || loadingAddresses) {
     return (
       <div className="min-h-svh flex flex-col bg-background">
         <div className="flex-1 flex items-center justify-center">
@@ -302,6 +334,32 @@ function CheckoutPage() {
               ${total.toFixed(2)} {currency.toUpperCase()}
             </span>
           </div>
+        </div>
+
+        <div className="global-card flex flex-col gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <MapPin size={16} /> Ship to
+          </h2>
+          {addresses && addresses.length > 1 ? (
+            <select
+              className="global-input"
+              aria-label="Shipping address"
+              value={address?.id}
+              onChange={(e) => setAddressId(e.target.value)}
+            >
+              {addresses.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.label} — {formatAddress(a)}
+                </option>
+              ))}
+            </select>
+          ) : (
+            address && (
+              <p className="text-sm text-foreground">
+                <span className="font-medium">{address.label}</span> — {formatAddress(address)}
+              </p>
+            )
+          )}
         </div>
 
         <div className="global-card">

@@ -1,4 +1,6 @@
-import { Plus, Minus, Star } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
+import StarRating from "@/components/StarRating";
+import ReviewForm from "@/components/ReviewForm";
 import type { AxiosError } from "axios";
 import publicAPI from "@/services/api/publicApi";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -130,6 +132,10 @@ function ProductPage() {
   const activeVariant =
     variants?.find((v) => v.id === activeVariantId) ?? variants?.[0] ?? null;
 
+  const averageRating = product?.review.length
+    ? product.review.reduce((sum, r) => sum + r.rating, 0) / product.review.length
+    : 0;
+
   if (isLoadingProduct || isLoadingVariants)
     return (
       <div className="min-h-svh flex flex-col bg-background">
@@ -231,6 +237,14 @@ function ProductPage() {
             <h1 className="text-3xl font-bold text-foreground capitalize line-clamp-2 break-words">
               {product.title}
             </h1>
+            {averageRating > 0 && (
+              <div className="mt-1 flex items-center gap-2">
+                <StarRating value={averageRating} />
+                <span className="text-xs text-muted-foreground">
+                  {averageRating.toFixed(1)} · {product.review.length} review{product.review.length > 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
             <div className="mt-2 flex flex-wrap gap-2">
               {product.product_category.length ? (
                 product.product_category.map((cat) => (
@@ -371,11 +385,21 @@ function ProductPage() {
 
       <div className="max-w-7xl w-full mx-auto px-6 pb-6">
         <div className="global-card flex flex-col gap-4">
-          <div className="border-b border-border pb-3">
+          <div className="border-b border-border pb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Reviews
             </h2>
+            {averageRating > 0 && (
+              <div className="flex items-center gap-2">
+                <StarRating value={averageRating} />
+                <span className="text-sm text-muted-foreground">
+                  {averageRating.toFixed(1)} ({product.review.length})
+                </span>
+              </div>
+            )}
           </div>
+
+          <ReviewForm productId={product.id} />
 
           {product.review.length ? (
             <div className="flex flex-col divide-y divide-border">
@@ -390,19 +414,7 @@ function ProductPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={16}
-                        className={
-                          i < review.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-muted-foreground/30"
-                        }
-                      />
-                    ))}
-                  </div>
+                  <StarRating value={review.rating} />
 
                   {review.title && (
                     <p className="font-semibold text-foreground mt-1">

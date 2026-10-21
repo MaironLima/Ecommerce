@@ -1,9 +1,9 @@
 import { hash } from 'bcrypt';
 import bcrypt from 'bcrypt';
 import { prisma } from '../../libs/prisma.js';
-import { JWT_SECRET, MAIL_PASSWORD, MAIL_USER, REFRESH_SECRET } from '../../config/env.js';
+import { JWT_SECRET, REFRESH_SECRET } from '../../config/env.js';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
+import { sendMail } from '../../config/mail.js';
 
 export const codes: Record<string, number> = {};
 
@@ -35,11 +35,11 @@ export async function registerService(email: string, password: string, name: str
 
 export async function loginService(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email: email } });
-  if (!user) throw new Error('Account is incorrect');
+  if (!user) throw new Error('Invalid email or password');
 
   const passwordCheck = await bcrypt.compare(password, user.password);
 
-  if (!passwordCheck) throw new Error('Wrong password');
+  if (!passwordCheck) throw new Error('Invalid email or password');
   if (!JWT_SECRET) throw new Error('The token not is defined');
   if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
 
@@ -106,20 +106,7 @@ export async function recoverEmailService(email: string) {
   const code = Math.floor(100000 + Math.random() * 900000);
   codes[email] = code;
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: MAIL_USER,
-      pass: MAIL_PASSWORD,
-    },
-  });
-
-  await transporter.sendMail({
-    from: 'E-commerce <no-reply@yourapp.com>',
-    to: email,
-    subject: 'Your verification code',
-    text: `Your verification code is: ${code}`,
-  });
+  await sendMail(email, 'Your verification code', `<p>Your verification code is: <strong>${code}</strong></p>`);
 }
 
 export async function recoverCodeService(email: string) {
@@ -129,7 +116,7 @@ export async function recoverCodeService(email: string) {
   if (!JWT_SECRET) throw new Error('The token not is defined');
   if (!REFRESH_SECRET) throw new Error('Cookies not is defined');
 
-  const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '15m' });
+  const accessToken = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '15m' });
   const refreshToken = jwt.sign({ userId: user.id }, REFRESH_SECRET, { expiresIn: '1d' });
 
   return { accessToken, refreshToken, name: user.name };

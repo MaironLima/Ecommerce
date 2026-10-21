@@ -12,7 +12,10 @@ import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const PAGE_SIZE = 20;
 
 interface Posts {
   id: string;
@@ -24,14 +27,27 @@ interface Posts {
 
 export default function Page() {
   const [orderBy, setOrderBy] = useState("Relevance");
-  const [page, setPage] = useState(1);
-  const { appName, order, category, setCategory } = useStore();
+  const { order, category, setCategory } = useStore();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const q = searchParams.get("q")?.trim() ?? "";
+
+  // Page resets to 1 whenever the search, category or sort changes.
+  const filterKey = `${q}|${category}|${order}`;
+  const [paging, setPaging] = useState({ key: filterKey, page: 1 });
+  const page = paging.key === filterKey ? paging.page : 1;
+  const setPage = (next: (p: number) => number) => setPaging({ key: filterKey, page: next(page) });
 
   const { data: posts = [], refetch } = useQuery<Posts[]>({
-    queryKey: ["posts", category, order, page],
+    queryKey: ["posts", category, order, page, q],
     queryFn: async () => {
+      if (q) {
+        const response = await publicAPI.get("/products/search", {
+          params: { q, sort: order.toLowerCase(), page },
+        });
+        return (response.data ?? []) as Posts[];
+      }
       const response = await publicAPI.get("/products", {
         params: { sort: order, page: page, category: category || "all" },
       });
@@ -51,9 +67,6 @@ export default function Page() {
 
   return (
     <div className="flex flex-col min-h-svh">
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 bg-background z-20 w-full">
-        <span className="font-semibold">{appName}</span>
-      </header>
 
       <SidebarProvider>
         <AppSidebar
@@ -66,7 +79,7 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">{category ?? "All"}</BreadcrumbLink>
+                  <BreadcrumbLink href="#">{q ? `Search: ${q}` : category ?? "All"}</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
@@ -112,17 +125,33 @@ export default function Page() {
                   </div>
                 ))
               ) : (
-                <span>No post founds.</span>
+                <span className="text-muted-foreground">{q ? `No products found for "${q}".` : "No products found."}</span>
               )}
             </div>
-            {/* <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" /> */}
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                className="global-btn flex items-center gap-1 disabled:opacity-40"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                title="Previous page"
+              >
+                <ChevronLeft size={16} /> Prev
+              </button>
+              <span className="text-sm text-muted-foreground">Page {page}</span>
+              <button
+                type="button"
+                className="global-btn flex items-center gap-1 disabled:opacity-40"
+                disabled={posts.length < PAGE_SIZE}
+                onClick={() => setPage((p) => p + 1)}
+                title="Next page"
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         </SidebarInset>
       </SidebarProvider>
-
-      <div className="bg-red-500">
-        <button onClick={() => setPage((pages) => pages + 1)}>{page}</button>
-      </div>
     </div>
   );
 }

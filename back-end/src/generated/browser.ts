@@ -87,3 +87,8 @@ export type Order = Prisma.OrderModel
  * 
  */
 export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel

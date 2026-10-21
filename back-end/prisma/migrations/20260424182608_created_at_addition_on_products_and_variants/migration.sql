@@ -1,3 +1,6 @@
+-- Required by idx_product_title_trgm
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 /*
   Warnings:
 

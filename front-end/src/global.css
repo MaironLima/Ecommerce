@@ -30,7 +30,8 @@ html, body {
         --border: 0 0% 89.8%;
         --input: 0 0% 89.8%;
         --ring: 0 0% 63%;
-        --radius: 0;
+        /* Same curve as .global-btn / .global-card (rounded-xl) so shadcn components match the custom ones. */
+        --radius: 0.75rem;
         --chart-1: 229.8 100% 82%;
         --chart-2: 242 100% 68.3%;
         --chart-3: 248.2 94% 59.4%;
@@ -88,10 +89,6 @@ html, body {
     body {
         @apply bg-background text-foreground font-sans;
     }
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Inter Variable';
-  }
   html {
     @apply font-sans;
   }

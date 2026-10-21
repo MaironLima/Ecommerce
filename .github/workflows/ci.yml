@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/e-commerce
+  JWT_SECRET: ci-jwt-secret
+  REFRESH_SECRET: ci-refresh-secret
+  LOG_HASH_SECRET: ci-log-secret
+  FRONTEND_URL: http://localhost:5174
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: e-commerce
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            back-end/package-lock.json
+            front-end/package-lock.json
+
+      - name: Install
+        run: |
+          npm ci --prefix back-end
+          npm ci --prefix front-end
+
+      # Same order as `npm run test:all`, one step per suite so failures are easy to spot.
+      - name: 1. Type-check
+        run: npm run test:types
+      - name: 2. Unit tests — back-end
+        run: npm run test:unit:back
+      - name: 3. Unit tests — front-end
+        run: npm run test:unit:front
+      - name: 4. Integration tests (real PostgreSQL)
+        run: npm run test:integration
+      - name: Install Playwright browser
+        run: npx --prefix front-end playwright install --with-deps chromium
+      - name: 5. E2E smoke
+        run: npm run test:smoke
+      - name: 6. E2E full journeys
+        run: npm run test:e2e
+      - name: 7. Load test (bomb)
+        run: npm run test:load
+        env:
+          LOAD_DURATION: 5
+          LOAD_P99_MS: 2500
+      - name: Front-end production build
+        run: npm run build --prefix front-end
+
+      - name: Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: front-end/playwright-report

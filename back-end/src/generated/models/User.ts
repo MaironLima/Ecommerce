@@ -203,6 +203,7 @@ export type UserWhereInput = {
   notification?: Prisma.NotificationListRelationFilter
   review?: Prisma.ReviewListRelationFilter
   order?: Prisma.OrderListRelationFilter
+  audit_log?: Prisma.AuditLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -218,6 +219,7 @@ export type UserOrderByWithRelationInput = {
   notification?: Prisma.NotificationOrderByRelationAggregateInput
   review?: Prisma.ReviewOrderByRelationAggregateInput
   order?: Prisma.OrderOrderByRelationAggregateInput
+  audit_log?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -236,6 +238,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   notification?: Prisma.NotificationListRelationFilter
   review?: Prisma.ReviewListRelationFilter
   order?: Prisma.OrderListRelationFilter
+  audit_log?: Prisma.AuditLogListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -277,6 +280,7 @@ export type UserCreateInput = {
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -292,6 +296,7 @@ export type UserUncheckedCreateInput = {
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUpdateInput = {
@@ -307,6 +312,7 @@ export type UserUpdateInput = {
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -322,6 +328,7 @@ export type UserUncheckedUpdateInput = {
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -387,6 +394,11 @@ export type UserMinOrderByAggregateInput = {
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -471,6 +483,22 @@ export type UserUpdateOneRequiredWithoutOrderNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOrderInput, Prisma.UserUpdateWithoutOrderInput>, Prisma.UserUncheckedUpdateWithoutOrderInput>
 }
 
+export type UserCreateNestedOneWithoutAudit_logInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAudit_logInput, Prisma.UserUncheckedCreateWithoutAudit_logInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAudit_logInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAudit_logNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAudit_logInput, Prisma.UserUncheckedCreateWithoutAudit_logInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAudit_logInput
+  upsert?: Prisma.UserUpsertWithoutAudit_logInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAudit_logInput, Prisma.UserUpdateWithoutAudit_logInput>, Prisma.UserUncheckedUpdateWithoutAudit_logInput>
+}
+
 export type UserCreateWithoutAddressesInput = {
   id?: string
   email: string
@@ -483,6 +511,7 @@ export type UserCreateWithoutAddressesInput = {
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUncheckedCreateWithoutAddressesInput = {
@@ -497,6 +526,7 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserCreateOrConnectWithoutAddressesInput = {
@@ -527,6 +557,7 @@ export type UserUpdateWithoutAddressesInput = {
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -541,6 +572,7 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserCreateWithoutCartInput = {
@@ -555,6 +587,7 @@ export type UserCreateWithoutCartInput = {
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUncheckedCreateWithoutCartInput = {
@@ -569,6 +602,7 @@ export type UserUncheckedCreateWithoutCartInput = {
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserCreateOrConnectWithoutCartInput = {
@@ -599,6 +633,7 @@ export type UserUpdateWithoutCartInput = {
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCartInput = {
@@ -613,6 +648,7 @@ export type UserUncheckedUpdateWithoutCartInput = {
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserCreateWithoutReviewInput = {
@@ -627,6 +663,7 @@ export type UserCreateWithoutReviewInput = {
   cart?: Prisma.CartCreateNestedManyWithoutId_syncInput
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUncheckedCreateWithoutReviewInput = {
@@ -641,6 +678,7 @@ export type UserUncheckedCreateWithoutReviewInput = {
   cart?: Prisma.CartUncheckedCreateNestedManyWithoutId_syncInput
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserCreateOrConnectWithoutReviewInput = {
@@ -671,6 +709,7 @@ export type UserUpdateWithoutReviewInput = {
   cart?: Prisma.CartUpdateManyWithoutId_syncNestedInput
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewInput = {
@@ -685,6 +724,7 @@ export type UserUncheckedUpdateWithoutReviewInput = {
   cart?: Prisma.CartUncheckedUpdateManyWithoutId_syncNestedInput
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserCreateWithoutNotificationInput = {
@@ -699,6 +739,7 @@ export type UserCreateWithoutNotificationInput = {
   cart?: Prisma.CartCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUncheckedCreateWithoutNotificationInput = {
@@ -713,6 +754,7 @@ export type UserUncheckedCreateWithoutNotificationInput = {
   cart?: Prisma.CartUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserCreateOrConnectWithoutNotificationInput = {
@@ -743,6 +785,7 @@ export type UserUpdateWithoutNotificationInput = {
   cart?: Prisma.CartUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationInput = {
@@ -757,6 +800,7 @@ export type UserUncheckedUpdateWithoutNotificationInput = {
   cart?: Prisma.CartUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserCreateWithoutOrderInput = {
@@ -771,6 +815,7 @@ export type UserCreateWithoutOrderInput = {
   cart?: Prisma.CartCreateNestedManyWithoutId_syncInput
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserUncheckedCreateWithoutOrderInput = {
@@ -785,6 +830,7 @@ export type UserUncheckedCreateWithoutOrderInput = {
   cart?: Prisma.CartUncheckedCreateNestedManyWithoutId_syncInput
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
 }
 
 export type UserCreateOrConnectWithoutOrderInput = {
@@ -815,6 +861,7 @@ export type UserUpdateWithoutOrderInput = {
   cart?: Prisma.CartUpdateManyWithoutId_syncNestedInput
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderInput = {
@@ -829,6 +876,83 @@ export type UserUncheckedUpdateWithoutOrderInput = {
   cart?: Prisma.CartUncheckedUpdateManyWithoutId_syncNestedInput
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+}
+
+export type UserCreateWithoutAudit_logInput = {
+  id?: string
+  email: string
+  name: string
+  role: $Enums.Permissions
+  created_at?: Date | string
+  updated_at?: Date | string
+  password: string
+  addresses?: Prisma.AddressCreateNestedManyWithoutId_syncInput
+  cart?: Prisma.CartCreateNestedManyWithoutId_syncInput
+  notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
+  review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
+  order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+}
+
+export type UserUncheckedCreateWithoutAudit_logInput = {
+  id?: string
+  email: string
+  name: string
+  role: $Enums.Permissions
+  created_at?: Date | string
+  updated_at?: Date | string
+  password: string
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutId_syncInput
+  cart?: Prisma.CartUncheckedCreateNestedManyWithoutId_syncInput
+  notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
+  review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
+  order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+}
+
+export type UserCreateOrConnectWithoutAudit_logInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAudit_logInput, Prisma.UserUncheckedCreateWithoutAudit_logInput>
+}
+
+export type UserUpsertWithoutAudit_logInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAudit_logInput, Prisma.UserUncheckedUpdateWithoutAudit_logInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAudit_logInput, Prisma.UserUncheckedCreateWithoutAudit_logInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAudit_logInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAudit_logInput, Prisma.UserUncheckedUpdateWithoutAudit_logInput>
+}
+
+export type UserUpdateWithoutAudit_logInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPermissionsFieldUpdateOperationsInput | $Enums.Permissions
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  addresses?: Prisma.AddressUpdateManyWithoutId_syncNestedInput
+  cart?: Prisma.CartUpdateManyWithoutId_syncNestedInput
+  notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
+  review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
+  order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAudit_logInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPermissionsFieldUpdateOperationsInput | $Enums.Permissions
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutId_syncNestedInput
+  cart?: Prisma.CartUncheckedUpdateManyWithoutId_syncNestedInput
+  notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
+  review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
+  order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 
@@ -842,6 +966,7 @@ export type UserCountOutputType = {
   notification: number
   review: number
   order: number
+  audit_log: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -850,6 +975,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   notification?: boolean | UserCountOutputTypeCountNotificationArgs
   review?: boolean | UserCountOutputTypeCountReviewArgs
   order?: boolean | UserCountOutputTypeCountOrderArgs
+  audit_log?: boolean | UserCountOutputTypeCountAudit_logArgs
 }
 
 /**
@@ -897,6 +1023,13 @@ export type UserCountOutputTypeCountOrderArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.OrderWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAudit_logArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -911,6 +1044,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   notification?: boolean | Prisma.User$notificationArgs<ExtArgs>
   review?: boolean | Prisma.User$reviewArgs<ExtArgs>
   order?: boolean | Prisma.User$orderArgs<ExtArgs>
+  audit_log?: boolean | Prisma.User$audit_logArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -951,6 +1085,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   notification?: boolean | Prisma.User$notificationArgs<ExtArgs>
   review?: boolean | Prisma.User$reviewArgs<ExtArgs>
   order?: boolean | Prisma.User$orderArgs<ExtArgs>
+  audit_log?: boolean | Prisma.User$audit_logArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -964,6 +1099,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     notification: Prisma.$NotificationPayload<ExtArgs>[]
     review: Prisma.$ReviewPayload<ExtArgs>[]
     order: Prisma.$OrderPayload<ExtArgs>[]
+    audit_log: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1372,6 +1508,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   notification<T extends Prisma.User$notificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   review<T extends Prisma.User$reviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   order<T extends Prisma.User$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$orderArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  audit_log<T extends Prisma.User$audit_logArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$audit_logArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1918,6 +2055,30 @@ export type User$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * User.audit_log
+ */
+export type User$audit_logArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

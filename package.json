@@ -1,0 +1,23 @@
+{
+  "name": "ecommerce-ongoing",
+  "private": true,
+  "scripts": {
+    "setup": "npm install && npm install --prefix back-end && npm install --prefix front-end && npm run prisma:deploy --prefix back-end && npm run seed --prefix back-end",
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm run dev --prefix back-end\" \"npm run dev --prefix front-end\"",
+    "build": "npm run build --prefix back-end && npm run build --prefix front-end",
+    "start": "concurrently -n api,web -c magenta,cyan \"npm start --prefix back-end\" \"npm run preview --prefix front-end -- --port 5173 --strictPort\"",
+    "test": "npm run test:unit",
+    "test:types": "npm run typecheck --prefix back-end && npm run typecheck --prefix front-end",
+    "test:unit:back": "npm run test:unit --prefix back-end",
+    "test:unit:front": "npm run test:unit --prefix front-end",
+    "test:unit": "npm run test:unit:back && npm run test:unit:front",
+    "test:integration": "npm run test:integration --prefix back-end",
+    "test:smoke": "npm run test:smoke --prefix front-end",
+    "test:e2e": "npm run test:e2e --prefix front-end",
+    "test:load": "npm run test:load --prefix back-end",
+    "test:all": "node scripts/test-all.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

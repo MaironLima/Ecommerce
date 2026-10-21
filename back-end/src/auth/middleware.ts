@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET, REFRESH_SECRET } from '../config/env.js';
+import { setLogUser } from '../common/utils/requestContext.js';
 
 
 
@@ -38,6 +39,7 @@ export function auth(req: Request, res: Response, next: NextFunction) {
       payload = jwt.verify(refreshToken, REFRESH_SECRET);
     }
     (req as any).user = payload;
+    setLogUser(payload?.userId);
     next();
   } catch (err: any) {
     const isExpired = err?.name === 'TokenExpiredError';

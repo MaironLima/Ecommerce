@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import sharp from "sharp";
 import path from "path";
 import fs from "fs";
+import logger from "../utils/logger.js";
 
 // Garante de forma segura que a pasta de uploads exista em qualquer ambiente (Windows/Linux)
 const UPLOAD_DIR = path.resolve(process.cwd(), 'imagens', 'uploads');
@@ -67,9 +68,10 @@ async function processImagesWithSharp(req: Request, res: Response, next: NextFun
       }
     }
 
+    logger.info('upload.processed', { event: 'upload.processed', main: Boolean(req.body.mainImageWebp), extras: req.body.extraImagesWebp?.length ?? 0 });
     next();
   } catch (error: any) {
-    console.error("Sharp Processing Error:", error);
+    logger.error('upload.processing_failed', { event: 'upload.processing_failed', reason: (error as Error)?.message });
     return res.status(500).json({ error: "Error processing image" });
   }
 }

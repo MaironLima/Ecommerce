@@ -15,7 +15,7 @@ privateAPI.interceptors.request.use(
   (config) => {
     const { accessToken } = useStore.getState();
     if (accessToken) {
-      config.headers.Authorization = accessToken;
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -40,7 +40,7 @@ privateAPI.interceptors.response.use(
         const { setAccessToken } = useStore.getState()
         setAccessToken(data.accessToken)
         // useStore.getState().setAccessToken(data.accessToken)=
-        originalRequest.headers.Authorization = data.accessToken;
+        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
         return privateAPI(originalRequest);
         
       } catch (refreshError) {
