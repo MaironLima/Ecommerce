@@ -15,7 +15,8 @@ Object.assign(process.env, {
   DATABASE_URL: url,
   PORT: process.env.E2E_API_PORT ?? '3100',
   FRONTEND_URL: process.env.E2E_WEB_URL ?? 'http://localhost:5174',
-  RATE_LIMIT_AUTH: process.env.RATE_LIMIT_AUTH ?? '1000',
+  // Not RATE_LIMIT_AUTH: back-end/.env (already loaded by dotenv) may set the dev limit, and E2E logs in many times.
+  RATE_LIMIT_AUTH: process.env.E2E_RATE_LIMIT_AUTH ?? '1000',
   MAIL_USER: '',
   MAIL_PASSWORD: '',
   STRIPE_SECRET_KEY: '',

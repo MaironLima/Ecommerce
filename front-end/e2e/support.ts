@@ -11,11 +11,16 @@ export const USERS = {
 } as const;
 
 export async function login(page: Page, email: string, password = PASSWORD) {
-  await page.goto("/auth/login");
+  await page.goto("/auth/login", { waitUntil: "networkidle" });
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
-  await page.getByRole("button", { name: "Login" }).click();
-  await expect(page.getByRole("button", { name: "Account menu" })).toBeVisible();
+  // Wait for the real API answer: a slow machine gets time, and a wrong status (e.g. 429) fails with a clear message.
+  const [response] = await Promise.all([
+    page.waitForResponse((r) => r.url().endsWith("/auth/login") && r.request().method() === "POST", { timeout: 30_000 }),
+    page.getByRole("button", { name: "Login" }).click(),
+  ]);
+  expect(response.status(), `login as ${email} (429 = rate limited)`).toBe(202);
+  await expect(page.getByRole("button", { name: "Account menu" })).toBeVisible({ timeout: 15_000 });
 }
 
 export async function logout(page: Page) {
