@@ -54,7 +54,13 @@ Volumes: `pgdata` (banco), `uploads` (imagens), `logs`, `caddy_data` (certificad
 
 ## 4. Stripe
 
-Webhook: `https://minhaloja.duckdns.org/webhooks/stripe` → copiar o `whsec_...` para `STRIPE_WEBHOOK_SECRET`.
+A loja roda **só em modo de teste**, inclusive em produção: a API não sobe com uma chave `sk_live_`. Com `pk_test_`, o checkout mostra o painel com os cartões de teste (4242 4242 4242 4242 etc.).
+
+No Dashboard, com **Test mode** ligado:
+- Developers → API keys: `pk_test_...` (Vercel) e `sk_test_...` (`.env` da VPS).
+- Developers → Webhooks → Add endpoint: `https://minhaloja.duckdns.org/webhooks/stripe`, eventos `payment_intent.succeeded`, `payment_intent.payment_failed` e `charge.refunded` → copiar o `whsec_...` para `STRIPE_WEBHOOK_SECRET`.
+
+Sem webhook o pagamento ainda funciona (o status do pedido é conferido no Stripe quando é consultado), mas com ele o pedido vira PAID na hora.
 
 ## Cookies
 

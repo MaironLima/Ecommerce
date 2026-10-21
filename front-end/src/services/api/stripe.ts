@@ -8,6 +8,8 @@ if (!publishableKey) {
   );
 }
 
+export const isStripeTestMode = publishableKey?.startsWith("pk_test_") ?? false;
+
 let stripePromise: Promise<Stripe | null> | null = null;
 
 export function getStripe(): Promise<Stripe | null> {
