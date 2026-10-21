@@ -39,6 +39,8 @@ const limiter = (windowMs: number, max: number, message: string) =>
 
 export function createApp(): Express {
   const app = express();
+  // Behind Caddy: trust one proxy hop so req.ip (rate limits, logs) is the client, not the proxy.
+  app.set('trust proxy', 1);
 
   // First: every log line of this request (webhook included) gets a request id.
   app.use(requestContext);

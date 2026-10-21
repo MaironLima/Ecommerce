@@ -12,11 +12,13 @@ import { codeSchema, emailSchema, passwordSchema, userSchema } from './dto.js';
 import type { CookieOptions } from 'express';
 import logger from '../../common/utils/logger.js';
 
-// Refresh token lives only in an HttpOnly cookie (not readable by JS); SameSite mitigates CSRF.
+// Refresh token lives only in an HttpOnly cookie (not readable by JS).
+// Production: front (*.vercel.app) and API (duckdns) are different sites, so the cookie must be SameSite=None + Secure.
+const isProd = process.env.NODE_ENV === 'production';
 const refreshCookie: CookieOptions = {
   httpOnly: true,
-  sameSite: 'lax',
-  secure: process.env.NODE_ENV === 'production',
+  sameSite: isProd ? 'none' : 'lax',
+  secure: isProd,
   maxAge: 24 * 60 * 60 * 1000,
 };
 

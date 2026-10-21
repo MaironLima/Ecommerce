@@ -69,3 +69,21 @@ jobs:
         with:
           name: playwright-report
           path: front-end/playwright-report
+
+  # CD: only after every test passed, only on push to main (never on PRs).
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: deploy-production
+    steps:
+      - name: Deploy to VPS (git pull + docker compose)
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          HOST: ${{ secrets.VPS_HOST }}
+          USER: ${{ secrets.VPS_USER }}
+          APP_DIR: ${{ secrets.VPS_APP_DIR }}
+        run: |
+          install -m 600 /dev/null key && printf '%s\n' "$SSH_KEY" > key
+          ssh -i key -o StrictHostKeyChecking=accept-new "$USER@$HOST" \
+            "set -e; cd '$APP_DIR'; git pull --ff-only; docker compose up -d --build; docker image prune -f"
