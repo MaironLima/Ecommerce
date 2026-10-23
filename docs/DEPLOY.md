@@ -141,3 +141,17 @@ Em produção o refresh token usa `SameSite=None; Secure`, porque front e API es
 Teste: faça um push na `main` e acompanhe em **Actions**. O job `deploy` só aparece depois que `test` termina com sucesso.
 
 **Vercel**: a integração Git da Vercel faz o deploy do front sozinha a cada push, sem esperar os testes. Se quiser que ela espere, desligue o auto-deploy e chame um Deploy Hook da Vercel no fim do job `deploy`.
+
+## 6. nginx antigo na VPS
+
+A VPS tinha um nginx ocupando 80/443 (Mini-Twitter). O Caddy deste compose precisa dessas portas, então o nginx é desligado e o Mini-Twitter fica fora do ar por enquanto.
+
+```bash
+cd ~/projetos/Ecommerce && git pull
+sudo systemctl disable --now nginx     # libera 80/443
+docker compose up -d                    # sobe o Caddy
+docker compose logs -f caddy            # esperar "certificate obtained"
+curl https://superecommerce.duckdns.org/health
+```
+
+Voltar atrás: `docker compose stop caddy && sudo systemctl enable --now nginx`.
