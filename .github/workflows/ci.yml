@@ -75,6 +75,7 @@ jobs:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: configs
     concurrency: deploy-production
     steps:
       - name: Deploy to VPS (git pull + docker compose)
