@@ -54,14 +54,6 @@ describe('Integration - auth & session', () => {
     expect(res.status).toBe(401);
   });
 
-  it('changes the password only with the current one', async () => {
-    const { auth } = await createUser();
-    const wrong = await api().patch('/users/me/password').set('Authorization', auth).send({ currentPassword: 'bad', newPassword: 'another1' });
-    expect(wrong.status).toBe(400);
-    const ok = await api().patch('/users/me/password').set('Authorization', auth).send({ currentPassword: 'Password123!', newPassword: 'another1' });
-    expect(ok.status).toBe(200);
-  });
-
   it('returns an X-Request-Id on every response and reuses a valid incoming one', async () => {
     const id = '3f2c1d4e-1111-4222-8333-944455556666';
     const res = await api().get('/ping').set('X-Request-Id', id);

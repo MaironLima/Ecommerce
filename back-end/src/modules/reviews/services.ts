@@ -34,7 +34,7 @@ export async function reviewGetService(productId: string) {
 export async function hasPurchasedProduct(userId: string, productId: string) {
   const paidItem = await prisma.orderItem.findFirst({
     where: {
-      order_sync: { user_id: userId, status: 'PAID' },
+      order_sync: { user_id: userId, status: { in: ['PAID', 'PARTIALLY_REFUNDED'] } },
       variant_sync: { product_id: productId },
     },
     select: { id: true },

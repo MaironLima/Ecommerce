@@ -27,7 +27,7 @@ interface Product {
   base_price: number;
   main_image: string;
   product_category: string[];
-  extra_imagens: string[];
+  extra_images: string[];
   review: Review[];
 }
 
@@ -94,7 +94,7 @@ function ProductPage() {
             (name: string | undefined): name is string => Boolean(name),
           ),
 
-        extra_imagens: (result.extra_imagens ?? []).flatMap(
+        extra_images: (result.extra_images ?? []).flatMap(
           (e: { path?: string[] }) => e.path ?? [],
         ),
 
@@ -110,7 +110,7 @@ function ProductPage() {
 
   const images = useMemo(() => {
     if (!product) return [];
-    return [product.main_image, ...(product.extra_imagens ?? [])].filter(
+    return [product.main_image, ...(product.extra_images ?? [])].filter(
       Boolean,
     );
   }, [product]);
@@ -173,7 +173,7 @@ function ProductPage() {
   return (
     <div className="min-h-svh flex flex-col bg-background">
       <Header />
-      <div className="w-full max-w-7xl mx-auto px-6 pt-4">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4">
         <UniversalBreadcrum
           labels={[
             { label: "Products", to: "/" },
@@ -184,7 +184,7 @@ function ProductPage() {
           ]}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 max-w-7xl w-full mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 p-4 sm:p-6 max-w-7xl w-full mx-auto">
         <div className="global-card p-3 flex flex-col items-center justify-center gap-3">
           {images.length ? (
             <>
@@ -263,11 +263,11 @@ function ProductPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-border pt-4">
-            <h3 className="text-2xl font-semibold text-primary">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+            <h3 className="text-2xl font-semibold text-primary whitespace-nowrap">
               $ {activeVariant?.priceOverride ?? product.base_price}
             </h3>
-            <div className="flex items-center gap-4">
+            <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-start">
               <div className="flex items-center gap-2">
                 <button
                   className="global-btn bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-sm p-2"
@@ -290,7 +290,7 @@ function ProductPage() {
                 </button>
               </div>
               <button
-                className="global-btn"
+                className="global-btn whitespace-nowrap"
                 onClick={handleAddToCart}
                 disabled={addToCartMutation.isPending || !activeVariant}
                 title="Add to cart"
@@ -383,7 +383,7 @@ function ProductPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl w-full mx-auto px-6 pb-6">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pb-6">
         <div className="global-card flex flex-col gap-4">
           <div className="border-b border-border pb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

@@ -4,7 +4,13 @@ import { FRONTEND_URL } from '../../config/env.js';
 import { HttpError } from '../../common/utils/errors.js';
 import logger from '../../common/utils/logger.js';
 
-export type NotificationType = 'ORDER_CREATED' | 'ORDER_PAID' | 'REVIEW_APPROVED';
+export type NotificationType =
+  | 'ORDER_CREATED'
+  | 'ORDER_PAID'
+  | 'REVIEW_APPROVED'
+  | 'RETURN_APPROVED'
+  | 'RETURN_REJECTED'
+  | 'RETURN_REFUNDED';
 
 function emailTemplate(name: string, message: string, link: string, linkLabel: string) {
   return `

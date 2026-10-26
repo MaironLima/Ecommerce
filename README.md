@@ -56,7 +56,7 @@ the PaymentIntent status, so checkout works locally without webhooks. Test card:
 
 ```
 Browser ──► Express API ──► PostgreSQL (Prisma + raw SQL for search/analytics)
-              │   ├── imagens/uploads (Sharp-optimized WebP, served by /uploads)
+              │   ├── images/uploads  (Sharp-optimized WebP, served by /uploads)
               │   ├── Stripe (PaymentIntents + webhook)
               │   └── SMTP (Nodemailer)
               └── node-cron: release expired reservations (1 min), cancel stale pending orders (5 min)
@@ -69,16 +69,17 @@ Back-end modules live in `back-end/src/modules/<name>/` (`routes → controllers
 | Area | Endpoints |
 |---|---|
 | Auth | `POST /auth/register · /auth/login · /auth/logout · /auth/refresh · /auth/recover-email · /auth/recover-code`, `PATCH /auth/recover-password` |
-| Profile | `GET/PATCH /users/me`, `PATCH /users/me/password`, `GET/POST /users/me/addresses`, `PUT/DELETE /users/me/addresses/:id` |
+| Profile | `GET/PATCH /users/me`, `GET/POST /users/me/addresses`, `PUT/DELETE /users/me/addresses/:id` |
 | Catalog | `GET /products?sort&category&page`, `GET /products/search?q=`, `GET /products/:id`, `GET /catalog/category`, `GET /variants/:productId` |
 | Catalog (admin) | `POST /products`, `PUT /products/:id`, `DELETE /products/:id`, `POST /variants/:productId`, `PUT /variants/:variantId` |
 | Cart | `GET /cart`, `POST /cart`, `PUT /cart/:id`, `DELETE /cart/:id` |
 | Checkout | `POST /checkout/session`, `POST /checkout/:orderId/confirm`, `GET /checkout/:orderId/status`, `POST /webhooks/stripe` |
 | Orders | `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel`, `POST /orders/:id/resume` |
+| Returns | `POST /orders/:id/returns`, `GET /returns`, `POST /returns/:id/cancel` |
 | Reviews | `GET /product/:id/review`, `GET /product/:id/review/eligibility`, `POST /product/:id/review`, `DELETE /product/:reviewId/review` |
 | Reviews (admin) | `GET /product/reviews` (pending), `PUT /product/:reviewId/validation/review` (approve) |
 | Notifications | `GET /notifications`, `PATCH /notifications/:id/read`, `PATCH /notifications/read-all` |
-| Admin | `GET /admin/analytics`, `GET /admin/users`, `PATCH /admin/users/:id/role` (SuperAdmin), `GET /admin/orders?status=`, `GET /admin/audit` |
+| Admin | `GET /admin/analytics`, `GET /admin/users`, `PATCH /admin/users/:id/role` (SuperAdmin), `GET /admin/orders?status=`, `GET /admin/audit`, `GET /admin/returns?status=`, `PATCH /admin/returns/:id/approve` \| `reject` \| `received`, `POST /admin/returns/:id/refund` |
 | Health | `GET /ping`, `GET /health` (checks the database) |
 
 ## Business rules
@@ -86,8 +87,9 @@ Back-end modules live in `back-end/src/modules/<name>/` (`routes → controllers
 - **Stock**: checkout reserves stock for 15 min (`InventoryReservation`); a cron returns expired reservations to stock.
 - **Reviews**: only users with a `PAID` order containing the product can review; one review per product; reviews are public only after admin approval.
 - **Notifications**: order created, payment confirmed and review approved generate an in-app notification and an e-mail. SMTP failures are logged and never break the flow.
+- **Returns & refunds**: within 7 days of the order (`RETURN_WINDOW_DAYS`), the customer asks to return all or part of a `PAID` order. Flow: requested → approved → received (stock goes back) → refunded through Stripe (idempotent). One open request per order (enforced by the database). The order becomes `PARTIALLY_REFUNDED` or `REFUNDED`.
 - **RBAC**: `401` without a valid token, `403` for insufficient role; only SuperAdmin changes roles.
-- **Audit**: every admin mutation (products, variants, review moderation, role changes) is stored in `audit_log`.
+- **Audit**: every admin mutation (products, variants, review moderation, role changes, return decisions and refunds) is stored in `audit_log`.
 
 ## Security
 

@@ -48,10 +48,10 @@ export type Category = Prisma.CategoryModel
  */
 export type ProductCategory = Prisma.ProductCategoryModel
 /**
- * Model ExtraImagens
+ * Model ExtraImages
  * 
  */
-export type ExtraImagens = Prisma.ExtraImagensModel
+export type ExtraImages = Prisma.ExtraImagesModel
 /**
  * Model Cart
  * 
@@ -92,3 +92,13 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model ReturnRequest
+ * 
+ */
+export type ReturnRequest = Prisma.ReturnRequestModel
+/**
+ * Model ReturnItem
+ * 
+ */
+export type ReturnItem = Prisma.ReturnItemModel

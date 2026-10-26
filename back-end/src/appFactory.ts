@@ -23,6 +23,7 @@ import stripeWebhookRoutes from './modules/webhooks/stripe/routes.js';
 import reviewRoutes from './modules/reviews/routes.js';
 import notificationRoutes from './modules/notifications/routes.js';
 import adminRoutes from './modules/admin/routes.js';
+import returnsRoutes from './modules/returns/routes.js';
 
 const limiter = (windowMs: number, max: number, message: string) =>
   rateLimit({
@@ -73,9 +74,9 @@ export function createApp(): Express {
       return res.status(400).json({ error: 'Parameter "path" is required' });
     }
 
-    // basename() blocks path traversal: only files directly inside imagens/uploads are served.
+    // basename() blocks path traversal: only files directly inside images/uploads are served.
     const fileName = path.basename(decodeURIComponent(fileSource));
-    const absolutePath = path.resolve(process.cwd(), 'imagens', 'uploads', fileName);
+    const absolutePath = path.resolve(process.cwd(), 'images', 'uploads', fileName);
 
     if (!fs.existsSync(absolutePath)) {
       return res.status(404).json({ error: 'File not found' });
@@ -103,6 +104,7 @@ export function createApp(): Express {
   app.use('/cart', cartRoutes);
   app.use('/checkout', checkoutRoutes);
   app.use('/orders', ordersRoutes);
+  app.use('/returns', returnsRoutes);
   app.use('/notifications', notificationRoutes);
   app.use('/admin', adminRoutes);
 

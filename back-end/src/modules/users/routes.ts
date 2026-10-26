@@ -2,9 +2,8 @@ import { Router } from 'express';
 import { auth } from '../../auth/middleware.js';
 import logger from '../../common/utils/logger.js';
 import { handle, userIdOf } from '../../common/utils/errors.js';
-import { addressSchema, passwordChangeSchema, profileSchema } from './dto.js';
+import { addressSchema, profileSchema } from './dto.js';
 import {
-  changePasswordService,
   createAddressService,
   deleteAddressService,
   getMeService,
@@ -26,13 +25,6 @@ userRoutes.patch('/me', handle(async (req, res) => {
   const { name } = profileSchema.parse(req.body);
   res.json(await updateMeService(userIdOf(req), name));
   logger.info('user.profile.updated', { event: 'user.profile.updated', fields: ['name'] });
-}));
-
-userRoutes.patch('/me/password', handle(async (req, res) => {
-  const { currentPassword, newPassword } = passwordChangeSchema.parse(req.body);
-  await changePasswordService(userIdOf(req), currentPassword, newPassword);
-  logger.info('user.password.changed', { event: 'user.password.changed' });
-  res.json({ message: 'Password changed successfully' });
 }));
 
 userRoutes.get('/me/addresses', handle(async (req, res) => {

@@ -2,6 +2,7 @@ import { prisma } from '../../libs/prisma.js';
 import { stripe } from '../../libs/stripe.js';
 import { HttpError } from '../../common/utils/errors.js';
 import { reserveStock } from '../stock/services.js';
+import { returnInfo } from '../returns/services.js';
 
 export async function listOrdersService(userId: string) {
   const orders = await prisma.order.findMany({
@@ -13,6 +14,7 @@ export async function listOrdersService(userId: string) {
           variant_sync: { select: { id: true, stock: true, attributes: true, product_id: true, product_sync: { select: { main_image: true } } } },
         },
       },
+      return_request: { orderBy: { created_at: 'desc' }, include: { return_item: true } },
     },
   });
 
@@ -22,6 +24,14 @@ export async function listOrdersService(userId: string) {
     total: Number(order.total),
     currency: order.currency,
     created_at: order.created_at,
+    ...returnInfo(order),
+    returns: order.return_request.map((r) => ({
+      id: r.id,
+      status: r.status,
+      refund_amount: Number(r.refund_amount),
+      admin_note: r.admin_note,
+      created_at: r.created_at,
+    })),
     items: order.order_item.map((item) => ({
       id: item.id,
       cart_item_id: item.cart_item_id,

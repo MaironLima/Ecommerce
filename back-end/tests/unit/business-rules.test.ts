@@ -41,7 +41,7 @@ describe('Reviews - only buyers can review', () => {
     db.review.create.mockResolvedValue({ id: 'r1', moderated: false });
     await expect(reviewPostService('p1', 'u1', 4, 'Nice', 'ok')).resolves.toMatchObject({ moderated: false });
     expect(db.orderItem.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { order_sync: { user_id: 'u1', status: 'PAID' }, variant_sync: { product_id: 'p1' } } }),
+      expect.objectContaining({ where: { order_sync: { user_id: 'u1', status: { in: ['PAID', 'PARTIALLY_REFUNDED'] } }, variant_sync: { product_id: 'p1' } } }),
     );
   });
 

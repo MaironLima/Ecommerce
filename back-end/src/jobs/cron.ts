@@ -8,12 +8,12 @@ export function startCronJobs() {
     try {
       const result = await releaseExpiredReservations();
       if (result.released > 0) {
-        logger.info(`[cron] ${result.released} reservas liberadas ao estoque`, {
+        logger.info(`[cron] ${result.released} expired reservations returned to stock`, {
           timestamp: new Date().toISOString(),
         });
       }
     } catch (e) {
-      logger.error(`[cron] Erro ao liberar reservas: ${(e as Error).message}`, {
+      logger.error(`[cron] Failed to release reservations: ${(e as Error).message}`, {
         timestamp: new Date().toISOString(),
       });
     }
@@ -23,12 +23,12 @@ export function startCronJobs() {
     try {
       const result = await cancelStalePendingOrdersService();
       if (result.cancelled > 0) {
-        logger.info(`[cron] ${result.cancelled} pedidos pendentes cancelados por inatividade`, {
+        logger.info(`[cron] ${result.cancelled} stale pending orders cancelled`, {
           timestamp: new Date().toISOString(),
         });
       }
     } catch (e) {
-      logger.error(`[cron] Erro ao cancelar pedidos pendentes: ${(e as Error).message}`, {
+      logger.error(`[cron] Failed to cancel pending orders: ${(e as Error).message}`, {
         timestamp: new Date().toISOString(),
       });
     }

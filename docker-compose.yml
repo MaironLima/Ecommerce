@@ -25,7 +25,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - uploads:/app/imagens/uploads
+      - uploads:/app/images/uploads
       - logs:/app/logs
     # No published port: only Caddy reaches api:3002 (trust proxy assumes that).
 

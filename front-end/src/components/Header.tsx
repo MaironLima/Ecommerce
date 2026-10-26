@@ -74,13 +74,14 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-primary text-primary-foreground shadow-md">
-      <div className="flex h-16 items-center gap-3 px-4">
+      {/* Phones: logo + icons on the first row, search full width below. sm and up: one row. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2 px-3 py-2 sm:h-16 sm:flex-nowrap sm:gap-3 sm:px-4 sm:py-0">
         <Link to="/" onClick={() => setValor("")} className="flex shrink-0 items-center gap-2" aria-label="Home">
           <img src="/vite.svg" alt="Logo" className="h-9" />
-          <span className="hidden text-lg font-bold tracking-tight lg:inline">{appName}</span>
+          <span className="text-lg font-bold tracking-tight sm:hidden lg:inline">{appName}</span>
         </Link>
 
-        <form onSubmit={handleSubmit} role="search" className="relative mx-auto min-w-0 flex-1 max-w-xl">
+        <form onSubmit={handleSubmit} role="search" className="relative order-last w-full sm:order-none sm:mx-auto sm:w-auto min-w-0 sm:flex-1 sm:max-w-xl">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 opacity-70" />
           <Input
             type="search"
@@ -92,7 +93,7 @@ function Header() {
           />
         </form>
 
-        <nav className="flex shrink-0 items-center gap-1" aria-label="Account">
+        <nav className="ml-auto flex shrink-0 items-center gap-0.5 sm:ml-0 sm:gap-1" aria-label="Account">
           <ModeToggle variant="ghost" className={barButton} />
 
           {accessToken && (

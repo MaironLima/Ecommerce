@@ -57,11 +57,20 @@ todos os eventos daquela requisição sem precisar perguntar e-mail ou outro dad
 ## Eventos registrados
 
 `http.request`, `auth.register`, `auth.login.success`/`failed`, `auth.logout`, `auth.refresh.failed`, `auth.recover.*`,
-`auth.password.reset`, `user.profile.updated`, `user.password.changed`, `user.address.created`/`updated`/`deleted`,
+`auth.password.reset`, `user.profile.updated`, `user.address.created`/`updated`/`deleted`,
 `cart.item.added`/`updated`/`removed`, `checkout.session.created`, `checkout.stripe_error`, `order.paid`, `order.cancelled`,
-`order.resumed`, `review.created`/`deleted`, `notification.created`, `mail.sent`/`failed`/`skipped`, `upload.processed`,
+`order.resumed`, `return.requested`/`cancelled`/`refunded`/`refund_failed`, `review.created`/`deleted`, `notification.created`, `mail.sent`/`failed`/`skipped`, `upload.processed`,
 `security.forbidden`, `security.rate_limited`, `request.failed`, `request.invalid`, `request.unhandled_error`, `audit`,
 `server.started`, `cron.*`, `stripe-webhook`.
+
+## Devoluções e reembolsos
+
+- Os eventos `return.*` levam só ids e valores (`returnId`, `orderId`, `amount`).
+- O comentário livre do cliente pode conter dado pessoal. Por isso ele fica só na tabela `return_request`, visível ao admin que
+  analisa o pedido, e **nunca vai para log nem para o `audit_log`** (minimização, art. 6º III).
+- O `audit_log` registra `RETURN_APPROVE`, `RETURN_REJECT`, `RETURN_RECEIVED` e `RETURN_REFUND`, com metadata `{ order, amount }`.
+  O motivo da recusa (`admin_note`) é mostrado ao cliente, mas não entra no audit.
+- A tela `/admin/returns` mostra só o nome do cliente: sem e-mail e sem endereço.
 
 ## Direitos do titular
 

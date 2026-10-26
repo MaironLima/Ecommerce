@@ -19,7 +19,8 @@ export async function finalizeOrderAsPaid(orderId: string) {
       where: { id: orderId },
       include: { order_item: { select: { id: true, cart_item_id: true } } },
     });
-    if (!order || order.status === 'PAID') return null;
+    // Already paid (or refunded later): a late or repeated payment event must not move it back to PAID.
+    if (!order || ['PAID', 'PARTIALLY_REFUNDED', 'REFUNDED'].includes(order.status)) return null;
 
     const cartItemIds = order.order_item
       .map(item => item.cart_item_id)

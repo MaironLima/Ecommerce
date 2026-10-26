@@ -1,4 +1,4 @@
-// Seeds a demo store: 3 roles, catalog with variants + generated images, orders, reviews, notifications.
+// Seeds a demo store: 3 roles, catalog with variants + generated images, orders, reviews, notifications, audit trail.
 // Idempotent: users are upserted; catalog/orders are only created when the catalog is empty.
 import bcrypt from 'bcrypt';
 import sharp from 'sharp';
@@ -7,7 +7,7 @@ import fs from 'fs';
 import { prisma } from '../src/libs/prisma.js';
 
 const PASSWORD = 'Password123!';
-const UPLOAD_DIR = path.resolve(process.cwd(), 'imagens', 'uploads');
+const UPLOAD_DIR = path.resolve(process.cwd(), 'images', 'uploads');
 
 const USERS = [
   { email: 'superadmin@store.com', name: 'Super Admin', role: 'SUPERADMIN' },
@@ -64,11 +64,13 @@ async function main() {
   }
   console.log(`users ready (password: ${PASSWORD})`);
 
-  if ((await prisma.product.count()) > 0) {
-    console.log('catalog already present, skipping products/orders');
-    return;
-  }
+  if ((await prisma.product.count()) > 0) console.log('catalog already present, skipping products/orders');
+  else await seedCatalog(users);
+  await seedAudit(users);
+  await seedReturns(users);
+}
 
+async function seedCatalog(users: Record<string, string>) {
   const variantsByProduct: { productId: string; title: string; variants: { id: string; attributes: Record<string, string>; price: number }[] }[] = [];
 
   for (const p of PRODUCTS) {
@@ -151,6 +153,65 @@ async function main() {
   });
 
   console.log('reviews, address and notifications created');
+}
+
+// Admin trail for the /admin/audit screen. Only when the table is empty, so re-running the seed adds nothing.
+// Metadata follows the LGPD rules of the real audit() helper: no e-mails, addresses or credentials.
+async function seedAudit(users: Record<string, string>) {
+  if ((await prisma.auditLog.count()) > 0) return;
+  const superadmin = users['superadmin@store.com']!;
+  const admin = users['admin@store.com']!;
+  const products = await prisma.product.findMany({ take: 4, orderBy: { created_at: 'asc' }, include: { product_variant: { take: 1 } } });
+  const review = await prisma.review.findFirst({ where: { moderated: true } });
+
+  const entries: { actor_id: string | null; action: string; entity_type: string; entity_id?: string; metadata?: object; created_at: Date }[] = [
+    { actor_id: superadmin, action: 'USER_ROLE_CHANGE', entity_type: 'User', entity_id: admin, metadata: { from: 'CUSTOMER', to: 'ADMIN' }, created_at: daysAgo(30) },
+    ...products.map((p, i) => ({ actor_id: admin, action: 'PRODUCT_CREATE', entity_type: 'Product', entity_id: p.id, metadata: { title: p.title }, created_at: daysAgo(28 - i) })),
+    ...products.slice(0, 2).map((p, i) => ({ actor_id: admin, action: 'PRODUCT_UPDATE', entity_type: 'Product', entity_id: p.id, metadata: { base_price: Number(p.base_price) }, created_at: daysAgo(14 - i) })),
+    ...products.flatMap(p => p.product_variant.slice(0, 1)).slice(0, 2).map((v, i) => ({ actor_id: admin, action: 'VARIANT_UPDATE', entity_type: 'ProductVariant', entity_id: v.id, metadata: { stock: v.stock }, created_at: daysAgo(10 - i) })),
+    ...(review ? [{ actor_id: admin, action: 'REVIEW_APPROVE', entity_type: 'Review', entity_id: review.id, created_at: daysAgo(7) }] : []),
+    { actor_id: admin, action: 'REVIEW_DELETE', entity_type: 'Review', entity_id: '00000000-0000-4000-8000-000000000001', created_at: daysAgo(5) },
+    { actor_id: superadmin, action: 'ACCESS_LOG_VIEW', entity_type: 'Logs', metadata: { from: daysAgo(9).toISOString().slice(0, 10), to: daysAgo(2).toISOString().slice(0, 10) }, created_at: daysAgo(2) },
+    { actor_id: admin, action: 'PRODUCT_DELETE', entity_type: 'Product', entity_id: '00000000-0000-4000-8000-000000000002', created_at: daysAgo(1) },
+  ];
+  await prisma.auditLog.createMany({ data: entries });
+  console.log(`${entries.length} audit log entries created`);
+}
+
+// Returns in a few states for /admin/returns. The newest customer order is left alone so the request flow can be tried.
+async function seedReturns(users: Record<string, string>) {
+  if ((await prisma.returnRequest.count()) > 0) return;
+  const paid = (email: string) =>
+    prisma.order.findMany({ where: { user_id: users[email]!, status: 'PAID' }, orderBy: { created_at: 'desc' }, include: { order_item: true } });
+  const [customer, john] = await Promise.all([paid('customer@store.com'), paid('john@store.com')]);
+
+  const make = async (order: (typeof customer)[number] | undefined, status: 'REQUESTED' | 'REFUNDED' | 'REJECTED', reason: 'REGRET' | 'DEFECTIVE' | 'WRONG_ITEM', extra: object = {}) => {
+    const item = order?.order_item[0];
+    if (!order || !item) return 0;
+    await prisma.returnRequest.create({
+      data: {
+        order_id: order.id,
+        user_id: order.user_id,
+        status,
+        reason,
+        refund_amount: item.unit_price_snapshot,
+        created_at: new Date(order.created_at.getTime() + 24 * 60 * 60 * 1000),
+        resolved_at: status === 'REQUESTED' ? null : new Date(order.created_at.getTime() + 3 * 24 * 60 * 60 * 1000),
+        return_item: { create: { order_item_id: item.id, quantity: 1 } },
+        ...extra,
+      },
+    });
+    if (status === 'REFUNDED') {
+      await prisma.order.update({ where: { id: order.id }, data: { status: item.quantity > 1 ? 'PARTIALLY_REFUNDED' : 'REFUNDED' } });
+    }
+    return 1;
+  };
+
+  const created =
+    (await make(john[0], 'REQUESTED', 'DEFECTIVE', { comment: 'Arrived with a torn seam.' })) +
+    (await make(customer[1], 'REFUNDED', 'REGRET')) +
+    (await make(customer[2], 'REJECTED', 'WRONG_ITEM', { admin_note: 'Item received was the one ordered (photos checked).' }));
+  console.log(`${created} return requests created`);
 }
 
 main()

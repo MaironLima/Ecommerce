@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, CheckCheck, LogOut, MapPin, Package, Pencil, Plus, Trash2, User } from "lucide-react";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
@@ -35,11 +35,11 @@ function ProfilePage() {
 
   return (
     <div className="flex flex-col bg-background">
-      <div className="w-full max-w-7xl mx-auto px-6 p-4">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <UniversalBreadcrum labels={[{ label: "Products", to: "/" }, "Profile"]} />
       </div>
-      <div className="w-full max-w-7xl mx-auto px-6 pb-6 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 items-start">
-        <nav className="global-card p-2 flex md:flex-col gap-1 overflow-x-auto" aria-label="Profile sections">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pb-6 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-6 items-start">
+        <nav className="global-card p-2 grid grid-cols-2 md:flex md:flex-col gap-1" aria-label="Profile sections">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -57,7 +57,7 @@ function ProfilePage() {
           <button
             type="button"
             onClick={logout}
-            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-destructive hover:bg-destructive/10 md:mt-2 md:border-t md:border-border"
+            className="col-span-2 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-destructive hover:bg-destructive/10 md:mt-2 md:border-t md:border-border"
           >
             <LogOut size={16} /> Log out
           </button>
@@ -86,8 +86,6 @@ function AccountTab() {
   const queryClient = useQueryClient();
   const { data: me } = useQuery<Me>({ queryKey: ["me"], queryFn: async () => (await privateAPI.get("/users/me")).data });
   const [name, setName] = useState<string | null>(null);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
 
   const saveName = useMutation({
     mutationFn: async () => (await privateAPI.patch("/users/me", { name })).data,
@@ -95,14 +93,6 @@ function AccountTab() {
       queryClient.setQueryData(["me"], (old: Me | undefined) => (old ? { ...old, name: data.name } : old));
       useStore.getState().setName(data.name);
       setName(null);
-    },
-  });
-
-  const changePassword = useMutation({
-    mutationFn: async () => privateAPI.patch("/users/me/password", { currentPassword, newPassword }),
-    onSuccess: () => {
-      setCurrentPassword("");
-      setNewPassword("");
     },
   });
 
@@ -136,23 +126,9 @@ function AccountTab() {
         <button type="submit" className="global-btn w-fit disabled:opacity-50" disabled={name === null || saveName.isPending}>
           Save
         </button>
-      </form>
-
-      <form
-        className="global-card flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          changePassword.mutate();
-        }}
-      >
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Change password</h2>
-        <input className="global-input" type="password" placeholder="Current password" aria-label="Current password" autoComplete="current-password" value={currentPassword} required onChange={(e) => setCurrentPassword(e.target.value)} />
-        <input className="global-input" type="password" placeholder="New password (min. 6)" aria-label="New password" autoComplete="new-password" value={newPassword} minLength={6} required onChange={(e) => setNewPassword(e.target.value)} />
-        {changePassword.isError && <span className="text-sm text-destructive">{apiError(changePassword.error)}</span>}
-        {changePassword.isSuccess && <span className="text-sm text-primary">Password changed!</span>}
-        <button type="submit" className="global-btn w-fit disabled:opacity-50" disabled={changePassword.isPending}>
-          Change password
-        </button>
+        <p className="text-xs text-muted-foreground">
+          To change your password, use <Link to="/auth/recover" className="text-primary hover:underline">password recovery</Link> (verified by email).
+        </p>
       </form>
     </div>
   );

@@ -93,7 +93,7 @@ describe('Integration - admin analytics & RBAC', () => {
   it('filters orders by status', async () => {
     const res = await api().get('/admin/orders?status=CANCELLED').set('Authorization', admin.auth);
     expect(res.body.orders).toHaveLength(1);
-    expect(res.body.orders[0].customer.email).toBe(customer.user.email);
+    expect(res.body.orders[0].customer.email).toMatch(/^\w\*\*\*@/); // masked (LGPD minimization)
     expect((await api().get('/admin/orders?status=WHATEVER').set('Authorization', admin.auth)).status).toBe(400);
   });
 
@@ -108,7 +108,8 @@ describe('Integration - admin analytics & RBAC', () => {
     expect(self.status).toBe(400);
 
     const audit = await api().get('/admin/audit').set('Authorization', admin.auth);
-    expect(audit.body.logs[0]).toMatchObject({ action: 'USER_ROLE_CHANGE', entity_id: customer.user.id });
+    expect(audit.body.logs[0]).toMatchObject({ action: 'USER_ROLE_CHANGE', entity_id: customer.user.id, metadata: { from: 'CUSTOMER', to: 'ADMIN' } });
+    expect(audit.body.logs[0].actor_sync).not.toHaveProperty('email');
   });
 
   it('lists users without password hashes', async () => {

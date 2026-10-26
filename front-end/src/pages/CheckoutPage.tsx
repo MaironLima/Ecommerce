@@ -8,35 +8,26 @@ import {
 } from "@stripe/react-stripe-js";
 import { useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { ArrowLeft, Loader2, MapPin } from "lucide-react";
+import { ArrowDownRight, ArrowLeft, Loader2, MapPin } from "lucide-react";
 import UniversalBreadcrum from "@/components/UniversalBreadcrum";
 import privateAPI from "@/services/api/privateApi";
 import { getStripe, isStripeTestMode } from "@/services/api/stripe";
-
-const TEST_CARDS = [
-  ["4242 4242 4242 4242", "Payment succeeds"],
-  ["4000 0025 0000 3155", "Requires 3D Secure authentication"],
-  ["4000 0000 0000 9995", "Declined (insufficient funds)"],
-] as const;
-
-function TestCardsNotice() {
-  return (
-    <details open className="rounded-md border border-dashed p-3 text-sm" data-testid="stripe-test-cards">
-      <summary className="cursor-pointer font-medium">Test mode: no real charges. Use a test card</summary>
-      <ul className="mt-2 flex flex-col gap-1">
-        {TEST_CARDS.map(([number, label]) => (
-          <li key={number}>
-            <code className="font-mono">{number}</code> — {label}
-          </li>
-        ))}
-      </ul>
-      <p className="mt-2 text-muted-foreground">Any future expiry date, any CVC, any postal code.</p>
-    </details>
-  );
-}
 import { useCartStore } from "@/stores/cartStore";
 import { useStore } from "@/stores/store";
 import { formatAddress, type Address } from "@/lib/shared";
+
+// Stripe.js shows its own "Stripe" test helper (bottom-right corner) in test mode; point the user to it.
+function TestModeHint() {
+  return (
+    <p className="flex items-center gap-2 rounded-md border border-dashed p-3 text-sm text-muted-foreground" data-testid="stripe-test-hint">
+      <ArrowDownRight size={16} className="shrink-0 text-primary" />
+      <span>
+        Test mode, no real charges. Open the <strong className="text-foreground">Stripe</strong> pop-up in the bottom-right
+        corner to fill in any test card (success, 3D Secure, declines).
+      </span>
+    </p>
+  );
+}
 
 interface CheckoutSessionResponse {
   order_id: string;
@@ -179,7 +170,7 @@ function CheckoutForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {isStripeTestMode && <TestCardsNotice />}
+      {isStripeTestMode && <TestModeHint />}
       <PaymentElement onReady={() => setReady(true)} />
       <button
         type="submit"
@@ -217,6 +208,12 @@ function CheckoutPage() {
   const accessToken = useStore((s) => s.accessToken);
   const fetchCart = useCartStore((s) => s.fetchCart);
   const clearLocal = useCartStore((s) => s.clearLocal);
+
+  // Stripe leaves its test helper iframe in <body> after the form unmounts; global.css hides it unless this class is set.
+  useEffect(() => {
+    document.body.classList.add("stripe-checkout");
+    return () => document.body.classList.remove("stripe-checkout");
+  }, []);
 
   const cartItemIds = (location.state as { cartItemIds?: string[] } | null)?.cartItemIds;
   const [addressId, setAddressId] = useState<string | null>(null);
@@ -285,7 +282,7 @@ function CheckoutPage() {
   if (accessToken && !loadingAddresses && !address) {
     return (
       <div className="min-h-svh flex flex-col bg-background">
-        <div className="w-full max-w-7xl mx-auto px-6 pt-4">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4">
           <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Checkout"]} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
@@ -316,7 +313,7 @@ function CheckoutPage() {
   if (error || !session || !options) {
     return (
       <div className="min-h-svh flex flex-col bg-background">
-        <div className="w-full max-w-7xl mx-auto px-6 pt-4">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4">
           <UniversalBreadcrum labels={["Checkout"]} />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
@@ -339,10 +336,10 @@ function CheckoutPage() {
 
   return (
     <div className="min-h-svh flex flex-col bg-background">
-      <div className="w-full max-w-7xl mx-auto px-6 pt-4">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4">
         <UniversalBreadcrum labels={[{ label: "Cart", to: "/cart" }, "Checkout"]} />
       </div>
-      <div className="flex-1 w-full max-w-3xl mx-auto px-6 pb-6 grid grid-cols-1 gap-6 items-start">
+      <div className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pb-6 grid grid-cols-1 gap-6 items-start">
         <div className="global-card flex flex-col gap-4">
           <h1 className="global-title">Checkout</h1>
           <div className="flex items-center justify-between border-t border-border pt-4">

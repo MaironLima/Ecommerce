@@ -11,6 +11,7 @@ import CartPage from "../pages/CartPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import OrdersPage from "../pages/OrdersPage";
 import ProfilePage from "../pages/ProfilePage";
+import { PrivacyPage, ReturnsPolicyPage, TermsPage } from "../pages/LegalPages";
 
 // Admin area (and Recharts) is code-split: customers never download it.
 const admin = (pick: (m: typeof import("../pages/admin/AdminTables")) => React.ComponentType) => async () => ({
@@ -25,6 +26,9 @@ const router = createBrowserRouter([
       { path: "checkout", element: <CheckoutPage /> },
       { path: "orders", element: <OrdersPage /> },
       { path: "profile", element: <ProfilePage /> },
+      { path: "privacy", element: <PrivacyPage /> },
+      { path: "terms", element: <TermsPage /> },
+      { path: "returns", element: <ReturnsPolicyPage /> },
       // Guard runs only when entering /admin (a <Navigate> in the layout would also fire on logout).
       { path: "admin", loader: ({ request }) =>
           useStore.getState().accessToken ? null : redirect(`/auth/login?from=${encodeURIComponent(new URL(request.url).pathname)}`),
@@ -33,6 +37,7 @@ const router = createBrowserRouter([
           { index: true, lazy: async () => ({ Component: (await import("../pages/admin/AdminDashboard")).default }) },
           { path: "products", lazy: async () => ({ Component: (await import("../pages/admin/AdminProducts")).default }) },
           { path: "orders", lazy: admin((m) => m.AdminOrders) },
+          { path: "returns", lazy: admin((m) => m.AdminReturns) },
           { path: "users", lazy: admin((m) => m.AdminUsers) },
           { path: "reviews", lazy: admin((m) => m.AdminReviews) },
           { path: "audit", lazy: admin((m) => m.AdminAudit) },

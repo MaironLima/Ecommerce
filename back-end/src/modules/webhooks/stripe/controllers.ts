@@ -5,6 +5,7 @@ import { STRIPE_WEBHOOK_SECRET } from '../../../config/env.js';
 import { prisma } from '../../../libs/prisma.js';
 import logger from '../../../common/utils/logger.js';
 import { finalizeOrderAsPaid } from '../../checkout/services.js';
+import { finalizeRefund } from '../../returns/services.js';
 
 const processedEvents = new Set<string>();
 
@@ -117,10 +118,19 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     return;
   }
 
-  await prisma.order.update({
-    where: { id: order.id },
-    data: { status: 'REFUNDED' },
+  // Refunds started from a return request: finish them (order status is recalculated per item).
+  const pending = await prisma.returnRequest.findMany({
+    where: { order_id: order.id, status: 'RECEIVED', stripe_refund_id: { not: null } },
+    select: { id: true },
   });
+  for (const r of pending) await finalizeRefund(r.id);
 
-  logger.info(`[stripe-webhook] order ${order.id} marked REFUNDED`);
+  // Refund made straight in the Stripe dashboard (no return request): go by the amounts.
+  const fromReturns = await prisma.returnRequest.count({ where: { order_id: order.id, status: 'REFUNDED' } });
+  if (fromReturns === 0) {
+    const status = charge.amount_refunded >= charge.amount ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+    await prisma.order.update({ where: { id: order.id }, data: { status } });
+  }
+
+  logger.info(`[stripe-webhook] charge refunded for order ${order.id}`);
 }

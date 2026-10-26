@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import type { z } from 'zod';
 import { prisma } from '../../libs/prisma.js';
 import { HttpError } from '../../common/utils/errors.js';
@@ -24,18 +23,6 @@ export async function updateMeService(userId: string, name: string) {
     data: { name },
     select: { id: true, name: true, email: true, role: true },
   });
-}
-
-export async function changePasswordService(userId: string, currentPassword: string, newPassword: string) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) throw new HttpError(404, 'User not found', 'NOT_FOUND');
-  if (!(await bcrypt.compare(currentPassword, user.password))) {
-    throw new HttpError(400, 'Current password is incorrect', 'WRONG_PASSWORD');
-  }
-  if (currentPassword === newPassword) {
-    throw new HttpError(400, 'Cannot be the same password as the previous one', 'SAME_PASSWORD');
-  }
-  await prisma.user.update({ where: { id: userId }, data: { password: await bcrypt.hash(newPassword, 12) } });
 }
 
 export async function listAddressesService(userId: string) {

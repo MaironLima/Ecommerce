@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import publicAPI from "@/services/api/publicApi";
 import { useStore } from "@/stores/store";
@@ -41,17 +42,21 @@ export function AppSidebar({
   const [activeOrderBy, setActiveOrderBy] = useState("Most Recent");
   const [activeCategory, setActiveCategory] = useState<string | null>("All");
   const { setCategory, setOrderBy } = useStore();
+  // Phones get the filters in a slide-in drawer (opened from MainPage); desktop keeps the fixed column.
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const handleOrderByClick = (title: string) => {
     setActiveOrderBy(title);
     onOrderByChange?.(title);
     setOrderBy(title);
+    setOpenMobile(false);
   };
 
   const handleCategoryClick = (title: string) => {
     setActiveCategory(title);
     onCategoryChange?.(title);
     setCategory(title);
+    setOpenMobile(false);
   };
 
   const { data: categories = [] } = useQuery<CategoryItem[]>({
@@ -69,7 +74,7 @@ export function AppSidebar({
   const displayCategories = [defaultCategory, ...categories];
 
   return (
-    <Sidebar collapsible="none" {...props} className="border-r border-b">
+    <Sidebar collapsible={isMobile ? "offcanvas" : "none"} {...props} className="border-r border-b">
       <SidebarHeader />
       <SidebarContent >
         <SidebarGroup>
@@ -95,7 +100,7 @@ export function AppSidebar({
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="font-bold">Categorys</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-bold">Categories</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {displayCategories.map((item: CategoryItem) => (

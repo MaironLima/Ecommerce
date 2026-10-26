@@ -145,3 +145,10 @@ html, body {
     color: hsl(var(--primary));
     filter: saturate(1.4) brightness(1.6) drop-shadow(0 0 6px hsl(var(--primary) / 0.45));
 }
+/* Stripe test-mode helper ("Stripe" pop-up, bottom-right) is injected into <body> and never removed.
+   Show it only on /checkout (CheckoutPage sets the class), otherwise it lingers over the whole site.
+   Stripe sets an inline `display: block !important`, so hide it with visibility instead. */
+body:not(.stripe-checkout) > iframe[src*="elements-inner-easel"] {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}

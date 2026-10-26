@@ -57,7 +57,7 @@ export const ModelName = {
   ProductVariant: 'ProductVariant',
   Category: 'Category',
   ProductCategory: 'ProductCategory',
-  ExtraImagens: 'ExtraImagens',
+  ExtraImages: 'ExtraImages',
   Cart: 'Cart',
   CartItem: 'CartItem',
   Review: 'Review',
@@ -65,7 +65,9 @@ export const ModelName = {
   Notification: 'Notification',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  ReturnRequest: 'ReturnRequest',
+  ReturnItem: 'ReturnItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -158,7 +160,7 @@ export const ProductCategoryScalarFieldEnum = {
 export type ProductCategoryScalarFieldEnum = (typeof ProductCategoryScalarFieldEnum)[keyof typeof ProductCategoryScalarFieldEnum]
 
 
-export const ExtraImagensScalarFieldEnum = {
+export const ExtraImagesScalarFieldEnum = {
   id: 'id',
   product_id: 'product_id',
   path: 'path',
@@ -167,7 +169,7 @@ export const ExtraImagensScalarFieldEnum = {
   optimized: 'optimized'
 } as const
 
-export type ExtraImagensScalarFieldEnum = (typeof ExtraImagensScalarFieldEnum)[keyof typeof ExtraImagensScalarFieldEnum]
+export type ExtraImagesScalarFieldEnum = (typeof ExtraImagesScalarFieldEnum)[keyof typeof ExtraImagesScalarFieldEnum]
 
 
 export const CartScalarFieldEnum = {
@@ -269,6 +271,34 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const ReturnRequestScalarFieldEnum = {
+  id: 'id',
+  order_id: 'order_id',
+  user_id: 'user_id',
+  status: 'status',
+  reason: 'reason',
+  comment: 'comment',
+  refund_amount: 'refund_amount',
+  stripe_refund_id: 'stripe_refund_id',
+  admin_note: 'admin_note',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  resolved_at: 'resolved_at'
+} as const
+
+export type ReturnRequestScalarFieldEnum = (typeof ReturnRequestScalarFieldEnum)[keyof typeof ReturnRequestScalarFieldEnum]
+
+
+export const ReturnItemScalarFieldEnum = {
+  id: 'id',
+  return_id: 'return_id',
+  order_item_id: 'order_item_id',
+  quantity: 'quantity'
+} as const
+
+export type ReturnItemScalarFieldEnum = (typeof ReturnItemScalarFieldEnum)[keyof typeof ReturnItemScalarFieldEnum]
 
 
 export const SortOrder = {

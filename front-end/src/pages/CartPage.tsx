@@ -130,7 +130,7 @@ function CartPage() {
   if (items.length === 0) {
     return (
       <div className="min-h-svh flex flex-col bg-background">
-        <div className="w-full max-w-7xl mx-auto px-6 pt-4">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4">
           <UniversalBreadcrum labels={["Cart"]} />
         </div>
         <div className="flex-1 flex items-center justify-center">
@@ -151,10 +151,10 @@ function CartPage() {
 
   return (
     <div className="min-h-svh flex flex-col bg-background">
-      <div className="w-full max-w-7xl mx-auto px-6 p-4">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 p-4">
         <UniversalBreadcrum labels={[{ label: "Cart", to: "/" }, "Choose Products"]} />
       </div>
-      <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pb-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 flex flex-col gap-3">
           <div className="global-card flex items-center gap-3">
             <input
@@ -180,7 +180,7 @@ function CartPage() {
               : "";
             const itemChecked = isChecked(item.id);
             return (
-              <div key={item.id} className="global-card flex items-center gap-3">
+              <div key={item.id} className="global-card flex flex-wrap items-center gap-3">
                 <input
                   type="checkbox"
                   checked={itemChecked}
@@ -224,7 +224,7 @@ function CartPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex w-full items-center justify-end gap-2 sm:w-auto sm:shrink-0">
                   <div className="inline-flex items-center bg-muted border border-border rounded-full  gap-2 w-fit">
                     <button
                       className="global-btn bg-secondary text-secondary-foreground rounded-full w-8 h-8 flex items-center justify-center p-0 disabled:opacity-50"

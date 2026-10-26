@@ -204,6 +204,7 @@ export type UserWhereInput = {
   review?: Prisma.ReviewListRelationFilter
   order?: Prisma.OrderListRelationFilter
   audit_log?: Prisma.AuditLogListRelationFilter
+  return_request?: Prisma.ReturnRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -220,6 +221,7 @@ export type UserOrderByWithRelationInput = {
   review?: Prisma.ReviewOrderByRelationAggregateInput
   order?: Prisma.OrderOrderByRelationAggregateInput
   audit_log?: Prisma.AuditLogOrderByRelationAggregateInput
+  return_request?: Prisma.ReturnRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -239,6 +241,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   review?: Prisma.ReviewListRelationFilter
   order?: Prisma.OrderListRelationFilter
   audit_log?: Prisma.AuditLogListRelationFilter
+  return_request?: Prisma.ReturnRequestListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -281,6 +284,7 @@ export type UserCreateInput = {
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -297,6 +301,7 @@ export type UserUncheckedCreateInput = {
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUpdateInput = {
@@ -313,6 +318,7 @@ export type UserUpdateInput = {
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -329,6 +335,7 @@ export type UserUncheckedUpdateInput = {
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -499,6 +506,20 @@ export type UserUpdateOneWithoutAudit_logNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAudit_logInput, Prisma.UserUpdateWithoutAudit_logInput>, Prisma.UserUncheckedUpdateWithoutAudit_logInput>
 }
 
+export type UserCreateNestedOneWithoutReturn_requestInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReturn_requestInput, Prisma.UserUncheckedCreateWithoutReturn_requestInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReturn_requestInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReturn_requestNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReturn_requestInput, Prisma.UserUncheckedCreateWithoutReturn_requestInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReturn_requestInput
+  upsert?: Prisma.UserUpsertWithoutReturn_requestInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReturn_requestInput, Prisma.UserUpdateWithoutReturn_requestInput>, Prisma.UserUncheckedUpdateWithoutReturn_requestInput>
+}
+
 export type UserCreateWithoutAddressesInput = {
   id?: string
   email: string
@@ -512,6 +533,7 @@ export type UserCreateWithoutAddressesInput = {
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateWithoutAddressesInput = {
@@ -527,6 +549,7 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserCreateOrConnectWithoutAddressesInput = {
@@ -558,6 +581,7 @@ export type UserUpdateWithoutAddressesInput = {
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -573,6 +597,7 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserCreateWithoutCartInput = {
@@ -588,6 +613,7 @@ export type UserCreateWithoutCartInput = {
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateWithoutCartInput = {
@@ -603,6 +629,7 @@ export type UserUncheckedCreateWithoutCartInput = {
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserCreateOrConnectWithoutCartInput = {
@@ -634,6 +661,7 @@ export type UserUpdateWithoutCartInput = {
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCartInput = {
@@ -649,6 +677,7 @@ export type UserUncheckedUpdateWithoutCartInput = {
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserCreateWithoutReviewInput = {
@@ -664,6 +693,7 @@ export type UserCreateWithoutReviewInput = {
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateWithoutReviewInput = {
@@ -679,6 +709,7 @@ export type UserUncheckedCreateWithoutReviewInput = {
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserCreateOrConnectWithoutReviewInput = {
@@ -710,6 +741,7 @@ export type UserUpdateWithoutReviewInput = {
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewInput = {
@@ -725,6 +757,7 @@ export type UserUncheckedUpdateWithoutReviewInput = {
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserCreateWithoutNotificationInput = {
@@ -740,6 +773,7 @@ export type UserCreateWithoutNotificationInput = {
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateWithoutNotificationInput = {
@@ -755,6 +789,7 @@ export type UserUncheckedCreateWithoutNotificationInput = {
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
   audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserCreateOrConnectWithoutNotificationInput = {
@@ -786,6 +821,7 @@ export type UserUpdateWithoutNotificationInput = {
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationInput = {
@@ -801,6 +837,7 @@ export type UserUncheckedUpdateWithoutNotificationInput = {
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
   audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserCreateWithoutOrderInput = {
@@ -816,6 +853,7 @@ export type UserCreateWithoutOrderInput = {
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateWithoutOrderInput = {
@@ -831,6 +869,7 @@ export type UserUncheckedCreateWithoutOrderInput = {
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserCreateOrConnectWithoutOrderInput = {
@@ -862,6 +901,7 @@ export type UserUpdateWithoutOrderInput = {
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrderInput = {
@@ -877,6 +917,7 @@ export type UserUncheckedUpdateWithoutOrderInput = {
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserCreateWithoutAudit_logInput = {
@@ -892,6 +933,7 @@ export type UserCreateWithoutAudit_logInput = {
   notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  return_request?: Prisma.ReturnRequestCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserUncheckedCreateWithoutAudit_logInput = {
@@ -907,6 +949,7 @@ export type UserUncheckedCreateWithoutAudit_logInput = {
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
   review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
   order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  return_request?: Prisma.ReturnRequestUncheckedCreateNestedManyWithoutUser_syncInput
 }
 
 export type UserCreateOrConnectWithoutAudit_logInput = {
@@ -938,6 +981,7 @@ export type UserUpdateWithoutAudit_logInput = {
   notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  return_request?: Prisma.ReturnRequestUpdateManyWithoutUser_syncNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAudit_logInput = {
@@ -953,6 +997,87 @@ export type UserUncheckedUpdateWithoutAudit_logInput = {
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
   review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
   order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  return_request?: Prisma.ReturnRequestUncheckedUpdateManyWithoutUser_syncNestedInput
+}
+
+export type UserCreateWithoutReturn_requestInput = {
+  id?: string
+  email: string
+  name: string
+  role: $Enums.Permissions
+  created_at?: Date | string
+  updated_at?: Date | string
+  password: string
+  addresses?: Prisma.AddressCreateNestedManyWithoutId_syncInput
+  cart?: Prisma.CartCreateNestedManyWithoutId_syncInput
+  notification?: Prisma.NotificationCreateNestedManyWithoutId_syncInput
+  review?: Prisma.ReviewCreateNestedManyWithoutId_syncInput
+  order?: Prisma.OrderCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogCreateNestedManyWithoutActor_syncInput
+}
+
+export type UserUncheckedCreateWithoutReturn_requestInput = {
+  id?: string
+  email: string
+  name: string
+  role: $Enums.Permissions
+  created_at?: Date | string
+  updated_at?: Date | string
+  password: string
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutId_syncInput
+  cart?: Prisma.CartUncheckedCreateNestedManyWithoutId_syncInput
+  notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutId_syncInput
+  review?: Prisma.ReviewUncheckedCreateNestedManyWithoutId_syncInput
+  order?: Prisma.OrderUncheckedCreateNestedManyWithoutUser_syncInput
+  audit_log?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActor_syncInput
+}
+
+export type UserCreateOrConnectWithoutReturn_requestInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReturn_requestInput, Prisma.UserUncheckedCreateWithoutReturn_requestInput>
+}
+
+export type UserUpsertWithoutReturn_requestInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReturn_requestInput, Prisma.UserUncheckedUpdateWithoutReturn_requestInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReturn_requestInput, Prisma.UserUncheckedCreateWithoutReturn_requestInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReturn_requestInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReturn_requestInput, Prisma.UserUncheckedUpdateWithoutReturn_requestInput>
+}
+
+export type UserUpdateWithoutReturn_requestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPermissionsFieldUpdateOperationsInput | $Enums.Permissions
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  addresses?: Prisma.AddressUpdateManyWithoutId_syncNestedInput
+  cart?: Prisma.CartUpdateManyWithoutId_syncNestedInput
+  notification?: Prisma.NotificationUpdateManyWithoutId_syncNestedInput
+  review?: Prisma.ReviewUpdateManyWithoutId_syncNestedInput
+  order?: Prisma.OrderUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUpdateManyWithoutActor_syncNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReturn_requestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPermissionsFieldUpdateOperationsInput | $Enums.Permissions
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutId_syncNestedInput
+  cart?: Prisma.CartUncheckedUpdateManyWithoutId_syncNestedInput
+  notification?: Prisma.NotificationUncheckedUpdateManyWithoutId_syncNestedInput
+  review?: Prisma.ReviewUncheckedUpdateManyWithoutId_syncNestedInput
+  order?: Prisma.OrderUncheckedUpdateManyWithoutUser_syncNestedInput
+  audit_log?: Prisma.AuditLogUncheckedUpdateManyWithoutActor_syncNestedInput
 }
 
 
@@ -967,6 +1092,7 @@ export type UserCountOutputType = {
   review: number
   order: number
   audit_log: number
+  return_request: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -976,6 +1102,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   review?: boolean | UserCountOutputTypeCountReviewArgs
   order?: boolean | UserCountOutputTypeCountOrderArgs
   audit_log?: boolean | UserCountOutputTypeCountAudit_logArgs
+  return_request?: boolean | UserCountOutputTypeCountReturn_requestArgs
 }
 
 /**
@@ -1030,6 +1157,13 @@ export type UserCountOutputTypeCountAudit_logArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReturn_requestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReturnRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1045,6 +1179,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   review?: boolean | Prisma.User$reviewArgs<ExtArgs>
   order?: boolean | Prisma.User$orderArgs<ExtArgs>
   audit_log?: boolean | Prisma.User$audit_logArgs<ExtArgs>
+  return_request?: boolean | Prisma.User$return_requestArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1086,6 +1221,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   review?: boolean | Prisma.User$reviewArgs<ExtArgs>
   order?: boolean | Prisma.User$orderArgs<ExtArgs>
   audit_log?: boolean | Prisma.User$audit_logArgs<ExtArgs>
+  return_request?: boolean | Prisma.User$return_requestArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1100,6 +1236,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     review: Prisma.$ReviewPayload<ExtArgs>[]
     order: Prisma.$OrderPayload<ExtArgs>[]
     audit_log: Prisma.$AuditLogPayload<ExtArgs>[]
+    return_request: Prisma.$ReturnRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1509,6 +1646,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   review<T extends Prisma.User$reviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   order<T extends Prisma.User$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$orderArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   audit_log<T extends Prisma.User$audit_logArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$audit_logArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  return_request<T extends Prisma.User$return_requestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$return_requestArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReturnRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2079,6 +2217,30 @@ export type User$audit_logArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.return_request
+ */
+export type User$return_requestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReturnRequest
+   */
+  select?: Prisma.ReturnRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReturnRequest
+   */
+  omit?: Prisma.ReturnRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReturnRequestInclude<ExtArgs> | null
+  where?: Prisma.ReturnRequestWhereInput
+  orderBy?: Prisma.ReturnRequestOrderByWithRelationInput | Prisma.ReturnRequestOrderByWithRelationInput[]
+  cursor?: Prisma.ReturnRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReturnRequestScalarFieldEnum | Prisma.ReturnRequestScalarFieldEnum[]
 }
 
 /**

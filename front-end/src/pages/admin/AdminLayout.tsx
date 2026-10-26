@@ -1,5 +1,7 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, FileSearch, MessageSquare, Package, ScrollText, ShoppingBag, Users } from "lucide-react";
+import { BarChart3, FileSearch, MessageSquare, Package, ScrollText, ShoppingBag, Undo2, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import privateAPI from "@/services/api/privateApi";
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +21,7 @@ const NAV = [
   { to: "/admin", label: "Dashboard", icon: BarChart3, end: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { to: "/admin/returns", label: "Returns", icon: Undo2 },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/reviews", label: "Reviews", icon: MessageSquare },
   { to: "/admin/audit", label: "Audit log", icon: ScrollText },
@@ -28,10 +31,23 @@ const NAV = [
 function AdminLayout() {
   const accessToken = useStore((s) => s.accessToken);
   const location = useLocation();
+  const isAdmin = isAdminRole(roleOf(accessToken));
+  // Pending returns badge; shares the cache with the Returns screen (its default filter is REQUESTED).
+  const { data: pending } = useQuery<unknown[]>({
+    queryKey: ["admin", "returns", "REQUESTED"],
+    queryFn: async () => (await privateAPI.get("/admin/returns", { params: { status: "REQUESTED" } })).data.returns,
+    enabled: isAdmin,
+  });
+  const badge = (to: string) =>
+    to === "/admin/returns" && pending?.length ? (
+      <span className="ml-auto rounded-full bg-primary px-1.5 text-xs text-primary-foreground" aria-label={`${pending.length} pending`}>
+        {pending.length}
+      </span>
+    ) : null;
 
   if (!accessToken) return null; // the route loader handles anonymous access
 
-  if (!isAdminRole(roleOf(accessToken))) {
+  if (!isAdmin) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="global-card-error">403 — You don't have access to the admin area.</div>
@@ -55,6 +71,7 @@ function AdminLayout() {
                     >
                       <NavLink to={to} end={end}>
                         <Icon size={16} /> {label}
+                        {badge(to)}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -77,6 +94,7 @@ function AdminLayout() {
               }
             >
               <Icon size={14} /> {label}
+              {badge(to)}
             </NavLink>
           ))}
         </nav>

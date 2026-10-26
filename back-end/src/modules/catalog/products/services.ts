@@ -121,7 +121,7 @@ export async function productsGetService(id: string) {
   const result = await prisma.product.findUnique({
     where: { id },
     include: {
-      extra_imagens: true,
+      extra_images: true,
       product_category: { include: { category_sync: { select: { name: true } } } },
       review: {
         where: {
@@ -195,7 +195,7 @@ export async function productsAddService(
       throw new Error('It was not possible relation the product with the category');
 
     if (extraImagesPaths && extraImagesPaths.length > 0) {
-      const images = await tx.extraImagens.createMany({
+      const images = await tx.extraImages.createMany({
         data: extraImagesPaths.map(imgPath => ({
           product_id: product.id,
           path: [imgPath],
@@ -254,8 +254,8 @@ export async function productsAttService(
     }
 
     if (extraImagesPaths && extraImagesPaths.length > 0) {
-      await tx.extraImagens.deleteMany({ where: { product_id: id } });
-      const images = await tx.extraImagens.createMany({
+      await tx.extraImages.deleteMany({ where: { product_id: id } });
+      const images = await tx.extraImages.createMany({
         data: extraImagesPaths.map(imgPath => ({
           product_id: id,
           path: [imgPath],
@@ -264,7 +264,7 @@ export async function productsAttService(
           optimized: true,
         })),
       });
-      if (images.count === 0) throw new Error('Não foi possível atualizar imagens extras');
+      if (images.count === 0) throw new Error('Could not update the extra images');
     }
   });
 }
@@ -288,7 +288,7 @@ export async function productsDeleteService(id: string) {
     await tx.review.deleteMany({ where: { product_id: id } });
     await tx.productVariant.deleteMany({ where: { product_id: id } });
     await tx.productCategory.deleteMany({ where: { product_id: id } });
-    await tx.extraImagens.deleteMany({ where: { product_id: id } });
+    await tx.extraImages.deleteMany({ where: { product_id: id } });
     await tx.product.deleteMany({ where: { id } });
   });
 }

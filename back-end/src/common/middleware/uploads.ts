@@ -6,7 +6,7 @@ import fs from "fs";
 import logger from "../utils/logger.js";
 
 // Garante de forma segura que a pasta de uploads exista em qualquer ambiente (Windows/Linux)
-const UPLOAD_DIR = path.resolve(process.cwd(), 'imagens', 'uploads');
+const UPLOAD_DIR = path.resolve(process.cwd(), 'images', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
@@ -55,7 +55,7 @@ async function processImagesWithSharp(req: Request, res: Response, next: NextFun
         const originalName = file.originalname;
         const sanitizedName = path.parse(originalName).name.replace(/\s+/g, "-");
 
-        // Adiciona o index no sufixo para evitar colisões entre as imagens extras do mesmo lote
+        // Index in the suffix avoids name collisions between extra images of the same batch
         const webpName = `${uniqueSuffix}-${index}-${sanitizedName}.webp`;
         const extraUploadPath = path.join(UPLOAD_DIR, webpName);
 
